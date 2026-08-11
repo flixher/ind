@@ -1,0 +1,2340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlexPlugs — Flixher's plugins</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1115; --surface:#171A21; --surface-2:#1E222B; --surface-3:#262B36;
+    --border:#2A2F3A; --border-soft:#20242D;
+    --text:#E7E9EE; --muted:#9198A6; --faint:#565C6B;
+    --accent:#7C5CFC; --accent-hover:#9380FF; --accent-soft:rgba(124,92,252,.14);
+    --gold:#FFC857; --danger:#FF6B6B; --admin:#33C481;
+    --f-display:'Sora',sans-serif; --f-body:'IBM Plex Sans',sans-serif; --f-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    background-image:radial-gradient(circle at 10% -10%, rgba(124,92,252,.08), transparent 40%);
+    color:var(--text);font-family:var(--f-body);-webkit-font-smoothing:antialiased;min-height:100vh;
+  }
+  h1,h2,h3,h4{font-family:var(--f-display);margin:0;}
+  button{font-family:inherit;cursor:pointer;}
+  input,textarea,select{font-family:inherit;}
+  a{color:inherit;}
+  ::selection{background:var(--accent);color:#fff;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .hidden{display:none!important;}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+
+  /* ---------- shell ---------- */
+  .site-header{
+    position:sticky;top:0;z-index:20;background:rgba(15,17,21,.92);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+  }
+  .header-inner{max-width:1280px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:20px;}
+  .brand{display:flex;align-items:center;gap:10px;flex:none;}
+  .brand-mark{width:30px;height:30px;flex:none;}
+  .brand-word{font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.01em;}
+  .brand-word span{color:var(--accent);}
+
+  .header-search{
+    flex:1;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);
+    padding:10px 14px;max-width:460px;
+  }
+  .header-search svg{color:var(--faint);flex:none;}
+  .header-search input{flex:1;background:transparent;border:0;color:var(--text);font-size:14px;}
+  .header-search input:focus{outline:none;}
+  .header-search input::placeholder{color:var(--faint);}
+
+  .header-auth{margin-left:auto;flex:none;display:flex;align-items:center;gap:10px;position:relative;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--surface-2);
+    color:var(--text);padding:10px 16px;font-size:13.5px;font-weight:600;border-radius:8px;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .btn:hover{border-color:var(--faint);}
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover);}
+  .btn-ghost{background:transparent;}
+  .btn-danger{color:var(--danger);}
+  .btn-sm{padding:7px 12px;font-size:12.5px;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  .avatar{
+    width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:var(--f-display);font-weight:700;font-size:13px;color:#fff;flex:none;
+  }
+  .avatar-btn{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);
+    padding:5px 12px 5px 5px;border-radius:999px;}
+  .avatar-btn .name{font-size:13.5px;font-weight:600;}
+  .avatar-btn .admin-tag{font-family:var(--f-mono);font-size:9.5px;color:var(--admin);border:1px solid var(--admin);
+    padding:1px 6px;border-radius:999px;margin-left:2px;}
+
+  .dropdown{
+    position:absolute;top:calc(100% + 8px);right:0;background:var(--surface-2);border:1px solid var(--border);
+    border-radius:10px;min-width:200px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,.4);
+  }
+  .dropdown .dd-item{
+    width:100%;text-align:left;background:none;border:0;color:var(--text);padding:10px 12px;font-size:13.5px;
+    border-radius:6px;display:flex;align-items:center;gap:8px;
+  }
+  .dropdown .dd-item:hover{background:var(--surface-3);}
+  .dropdown .dd-meta{padding:8px 12px 4px;font-size:11.5px;color:var(--faint);font-family:var(--f-mono);border-bottom:1px solid var(--border);margin-bottom:4px;}
+
+  /* ---------- hero ---------- */
+  .hero{max-width:1280px;margin:0 auto;padding:42px 24px 10px;}
+  .hero .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+  .hero h1{font-size:clamp(28px,4vw,40px);letter-spacing:-.01em;margin-bottom:8px;}
+  .hero p{color:var(--muted);max-width:60ch;font-size:14.5px;line-height:1.6;margin:0;}
+  .chat-btn{position:relative;padding:10px 12px;}
+  .chat-badge{
+    position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;font-family:var(--f-mono);
+    font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:999px;display:flex;align-items:center;
+    justify-content:center;padding:0 4px;
+  }
+
+  /* ---------- layout ---------- */
+  .layout{max-width:1280px;margin:0 auto;padding:26px 24px 100px;display:grid;grid-template-columns:230px 1fr;gap:30px;align-items:start;}
+  @media (max-width:880px){.layout{grid-template-columns:1fr;}}
+
+  .sidebar{position:sticky;top:84px;display:flex;flex-direction:column;gap:22px;}
+  @media (max-width:880px){.sidebar{position:static;flex-direction:row;flex-wrap:wrap;gap:16px;}}
+
+  .side-block h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;}
+  .tag-list{display:flex;flex-direction:column;gap:2px;}
+  @media (max-width:880px){.tag-list{flex-direction:row;flex-wrap:wrap;}}
+  .tag-row{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;background:none;border:0;
+    color:var(--muted);font-size:13px;padding:7px 8px;border-radius:6px;text-align:left;width:100%;
+  }
+  @media (max-width:880px){.tag-row{width:auto;border:1px solid var(--border);padding:6px 12px;}}
+  .tag-row:hover{background:var(--surface);color:var(--text);}
+  .tag-row.active{background:var(--accent-soft);color:var(--accent-hover);font-weight:600;}
+  .tag-row .n{font-family:var(--f-mono);font-size:11px;color:var(--faint);}
+
+  .fav-toggle{
+    display:flex;align-items:center;gap:8px;width:100%;background:var(--surface);border:1px solid var(--border);
+    color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;font-weight:600;
+  }
+  .fav-toggle.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover);}
+
+  .main-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px;flex-wrap:wrap;}
+  .result-count{color:var(--muted);font-size:13px;font-family:var(--f-mono);}
+  select#sortSelect{
+    background:var(--surface);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;
+  }
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;}
+
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;
+    cursor:pointer;transition:transform .15s ease, border-color .15s ease;animation:cardIn .3s ease both;
+  }
+  .card:hover{border-color:var(--faint);transform:translateY(-2px);}
+  @keyframes cardIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .card-img{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--surface-2);display:block;}
+  .card-body{padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px;flex:1;}
+  .card-body h3{font-size:15.5px;}
+  .card-author{font-size:11.5px;color:var(--faint);font-family:var(--f-mono);}
+  .card-author .admin-dot{color:var(--admin);}
+  .card-desc{font-size:12.8px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em;}
+  .card-tags{display:flex;flex-wrap:wrap;gap:5px;}
+  .pill{font-family:var(--f-mono);font-size:10.5px;background:var(--surface-2);border:1px solid var(--border);color:var(--muted);padding:3px 8px;border-radius:999px;}
+  .card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:10px;border-top:1px solid var(--border-soft);}
+  .star-row{position:relative;display:inline-block;letter-spacing:1px;line-height:1;font-size:13px;}
+  .star-row-base{color:var(--border);}
+  .star-row-fill{position:absolute;left:0;top:0;overflow:hidden;white-space:nowrap;color:var(--gold);}
+  .rating-num{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);margin-left:6px;}
+  .icon-btn{
+    background:var(--surface-2);border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;transition:all .15s ease;
+  }
+  .icon-btn:hover{border-color:var(--faint);color:var(--text);}
+  .icon-btn.fav-active{background:rgba(255,200,87,.14);border-color:var(--gold);color:var(--gold);}
+  .card-actions{display:flex;gap:6px;}
+
+  .empty-state{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--muted);}
+  .empty-state h3{font-size:18px;margin-bottom:8px;}
+  .empty-state p{font-size:13px;max-width:44ch;margin:0 auto;}
+
+  /* ---------- FAB ---------- */
+  .fab{
+    position:fixed;right:26px;bottom:26px;width:58px;height:58px;border-radius:50%;background:var(--accent);
+    border:0;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 26px rgba(124,92,252,.5);
+    z-index:30;transition:transform .15s ease, background .15s ease;
+  }
+  .fab:hover{background:var(--accent-hover);transform:translateY(-2px);}
+  .fab svg{width:26px;height:26px;}
+  @keyframes fabPulse{0%{box-shadow:0 0 0 0 rgba(124,92,252,.55);}70%{box-shadow:0 0 0 14px rgba(124,92,252,0);}100%{box-shadow:0 0 0 0 rgba(124,92,252,0);}}
+  .fab.pulse{animation:fabPulse 2.4s ease infinite;}
+
+  /* ---------- modal ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(8,9,12,.72);backdrop-filter:blur(3px);z-index:50;
+    display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;
+  }
+  .modal{
+    background:var(--surface);border:1px solid var(--border);border-radius:14px;max-width:560px;width:100%;
+    padding:26px;animation:modalIn .2s ease both;
+  }
+  .modal.wide{max-width:760px;}
+  @keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px;}
+  .modal-head h2{font-size:20px;}
+  .modal-close{background:none;border:0;color:var(--muted);width:30px;height:30px;flex:none;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+  .modal-close:hover{background:var(--surface-2);color:var(--text);}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:6px;}
+  .field .hint{font-size:11.5px;color:var(--faint);margin-top:5px;}
+  .field input[type=text], .field input[type=password], .field textarea{
+    width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:10px 12px;
+    border-radius:8px;font-size:14px;
+  }
+  .field textarea{resize:vertical;min-height:90px;font-family:var(--f-body);}
+  .field input:focus, .field textarea:focus{outline:none;border-color:var(--accent);}
+  .pw-wrap{position:relative;}
+  .pw-wrap input{padding-right:40px;}
+  .pw-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--faint);padding:6px;}
+
+  .tabs{display:flex;gap:4px;background:var(--surface-2);border-radius:8px;padding:4px;margin-bottom:18px;}
+  .tab-btn{flex:1;background:none;border:0;color:var(--muted);padding:8px;border-radius:6px;font-size:13px;font-weight:600;}
+  .tab-btn.active{background:var(--accent);color:#fff;}
+
+  .checkline{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:16px;}
+  .form-error{color:var(--danger);font-size:12.5px;margin-bottom:14px;min-height:1em;}
+
+  .tag-input-wrap{display:flex;flex-wrap:wrap;gap:6px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px;}
+  .tag-input-wrap input{flex:1;min-width:110px;background:transparent;border:0;color:var(--text);font-size:13px;padding:4px;}
+  .tag-input-wrap input:focus{outline:none;}
+  .tag-chip{display:flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent-hover);border-radius:999px;padding:4px 6px 4px 10px;font-size:12.5px;font-family:var(--f-mono);}
+  .tag-chip button{background:none;border:0;color:inherit;display:flex;padding:2px;}
+
+  .file-drop{
+    display:flex;align-items:center;gap:12px;background:var(--surface-2);border:1px dashed var(--border);border-radius:8px;
+    padding:12px;font-size:12.5px;color:var(--muted);
+  }
+  .file-drop img{width:52px;height:52px;object-fit:cover;border-radius:6px;background:var(--surface-3);flex:none;}
+  .file-drop .file-icon{width:52px;height:52px;border-radius:6px;background:var(--surface-3);flex:none;display:flex;align-items:center;justify-content:center;color:var(--faint);}
+  .file-drop .fname{color:var(--text);font-weight:600;word-break:break-all;}
+
+  /* ---------- plugin detail ---------- */
+  .detail-head{display:flex;gap:16px;margin-bottom:16px;}
+  .detail-img{width:112px;height:112px;border-radius:12px;object-fit:cover;background:var(--surface-2);flex:none;}
+  .detail-title h2{font-size:22px;margin-bottom:4px;}
+  .detail-author{font-size:12.5px;color:var(--faint);font-family:var(--f-mono);margin-bottom:8px;}
+  .detail-rating{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .detail-actions{display:flex;gap:8px;margin-top:8px;}
+  .detail-desc{font-size:13.5px;line-height:1.65;color:var(--text);margin:18px 0;white-space:pre-line;}
+  .detail-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+
+  .section-title{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:22px 0 12px;}
+  .review{border-top:1px solid var(--border-soft);padding:14px 0;}
+  .review:first-child{border-top:0;}
+  .review-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .review-top .avatar{width:26px;height:26px;font-size:11px;}
+  .review-name{font-weight:600;font-size:13px;}
+  .review-date{font-size:11px;color:var(--faint);font-family:var(--f-mono);margin-left:auto;}
+  .review-text{font-size:13px;color:var(--muted);line-height:1.55;margin-top:4px;}
+  .review-del{font-size:11px;color:var(--danger);background:none;border:0;margin-top:6px;padding:0;text-decoration:underline;}
+
+  .rating-input{display:flex;gap:4px;}
+  .rating-star{background:none;border:0;font-size:26px;color:var(--border);padding:0;line-height:1;transition:color .1s ease;}
+  .rating-star.filled{color:var(--gold);}
+
+  .signin-prompt{
+    background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;font-size:13px;color:var(--muted);
+  }
+
+  #toast{
+    position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--surface-2);border:1px solid var(--accent);
+    color:var(--text);padding:12px 20px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .25s ease, transform .25s ease;
+    pointer-events:none;z-index:60;max-width:90vw;text-align:center;
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0);}
+
+  footer{max-width:1280px;margin:0 auto;padding:0 24px 40px;color:var(--faint);font-size:11.5px;font-family:var(--f-mono);text-align:center;}
+
+  /* ---------- chat ---------- */
+  .chat-modal{max-width:920px;width:100%;height:80vh;padding:0;display:flex;flex-direction:column;overflow:hidden;}
+  .chat-modal .modal-head{padding:18px 20px;margin:0;border-bottom:1px solid var(--border);flex:none;}
+  .chat-body{flex:1;display:flex;min-height:0;}
+  .chat-nav{width:250px;flex:none;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--surface-2);}
+  .chat-tabs{display:flex;border-bottom:1px solid var(--border);flex:none;}
+  .chat-tab{flex:1;background:none;border:0;color:var(--muted);padding:12px 6px;font-size:12px;font-weight:600;position:relative;}
+  .chat-tab.active{color:var(--text);box-shadow:inset 0 -2px 0 var(--accent);}
+  .chat-tab .tab-badge{background:var(--danger);color:#fff;font-size:9px;border-radius:999px;padding:1px 5px;margin-left:5px;font-family:var(--f-mono);}
+  .chat-nav-list{flex:1;overflow-y:auto;padding:8px;}
+  .chat-nav-empty{color:var(--faint);font-size:12px;padding:16px 10px;text-align:center;}
+  .chat-row{
+    display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;border-radius:8px;padding:9px 8px;
+    text-align:left;color:var(--text);margin-bottom:2px;
+  }
+  .chat-row:hover{background:var(--surface-3);}
+  .chat-row.active{background:var(--accent-soft);}
+  .chat-row .avatar{flex:none;}
+  .chat-row-text{min-width:0;flex:1;}
+  .chat-row-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+  .chat-row-preview{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .chat-row-unread{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;}
+  .group-avatar{
+    width:34px;height:34px;border-radius:50%;background:var(--surface-3);display:flex;align-items:center;justify-content:center;
+    color:var(--muted);flex:none;
+  }
+  .chat-nav-actions{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border);flex:none;}
+  .chat-nav-actions .btn{flex:1;justify-content:center;}
+
+  .friend-row{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;}
+  .friend-row:hover{background:var(--surface-3);}
+  .friend-row-text{flex:1;min-width:0;font-size:13px;font-weight:600;}
+  .friend-search{display:flex;gap:6px;padding:10px;border-bottom:1px solid var(--border);flex:none;}
+  .friend-search input{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 10px;font-size:13px;}
+  .friend-search input:focus{outline:none;border-color:var(--accent);}
+  .request-section-title{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);padding:10px 8px 4px;}
+
+  .new-chat-panel{border-bottom:1px solid var(--border);padding:10px;flex:none;max-height:260px;overflow-y:auto;}
+  .new-chat-panel .friend-pick{display:flex;align-items:center;gap:8px;padding:6px 4px;font-size:12.5px;}
+  .new-chat-panel input[type=text]{
+    width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;
+    padding:8px 10px;font-size:12.5px;margin-top:8px;
+  }
+
+  .chat-main{flex:1;display:flex;flex-direction:column;min-width:0;}
+  .chat-main-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border);flex:none;}
+  .chat-main-head .title{font-weight:700;font-size:14.5px;}
+  .chat-main-head .sub{font-size:11.5px;color:var(--faint);font-family:var(--f-mono);}
+  .chat-thread{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px;}
+  .chat-placeholder{margin:auto;text-align:center;color:var(--faint);font-size:13px;max-width:36ch;}
+
+  .msg-row{display:flex;gap:10px;max-width:78%;}
+  .msg-row.mine{align-self:flex-end;flex-direction:row-reverse;}
+  .msg-row .avatar{flex:none;width:28px;height:28px;font-size:11px;}
+  .msg-col{display:flex;flex-direction:column;gap:4px;min-width:0;}
+  .msg-meta{font-size:11px;color:var(--faint);font-family:var(--f-mono);}
+  .msg-row.mine .msg-meta{text-align:right;}
+  .msg-bubble{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:9px 12px;font-size:13.5px;line-height:1.5;word-break:break-word;}
+  .msg-row.mine .msg-bubble{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .msg-attachments{display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+  .msg-img{max-width:220px;max-height:220px;border-radius:8px;display:block;cursor:zoom-in;}
+  .msg-file-chip{
+    display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.12);
+    border-radius:8px;padding:7px 10px;font-size:12px;
+  }
+  .msg-row:not(.mine) .msg-file-chip{background:var(--surface-3);border-color:var(--border);}
+  .msg-file-chip .fname{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px;}
+  .msg-file-chip button{background:none;border:0;color:inherit;display:flex;}
+
+  .chat-compose{border-top:1px solid var(--border);padding:12px 14px;flex:none;}
+  .compose-attachments{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+  .compose-row{display:flex;align-items:center;gap:8px;}
+  .compose-row input[type=text]{
+    flex:1;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:999px;
+    padding:11px 16px;font-size:13.5px;
+  }
+  .compose-row input[type=text]:focus{outline:none;border-color:var(--accent);}
+  .compose-icon-btn{
+    background:var(--surface-2);border:1px solid var(--border);color:var(--muted);width:38px;height:38px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;flex:none;
+  }
+  .compose-icon-btn:hover{color:var(--text);border-color:var(--faint);}
+  .compose-send{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .compose-send:hover{background:var(--accent-hover);}
+  .link-inline{color:var(--accent-hover);text-decoration:underline;word-break:break-word;}
+  .friend-row .avatar{width:30px;height:30px;font-size:12px;}
+  .chat-nav-list .friend-search{padding:0 0 10px;border-bottom:0;}
+  .chat-nav-list .request-section-title:first-of-type{margin-top:2px;}
+
+  @media (max-width:720px){
+    .chat-modal{height:92vh;}
+    .chat-nav{position:absolute;inset:0;z-index:2;background:var(--surface-2);width:100%;}
+    .chat-nav.tucked{display:none;}
+    .chat-main.tucked{display:none;}
+  }
+
+  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" fill="none">
+        <rect x="4" y="4" width="24" height="24" rx="7" fill="#7C5CFC"/>
+        <path d="M12 12v-3a2 2 0 1 1 4 0v3M20 12v-3a2 2 0 1 1 4 0v3" stroke="#0F1115" stroke-width="2" stroke-linecap="round"/>
+        <rect x="10" y="12" width="12" height="8" rx="2" fill="#0F1115"/>
+        <path d="M16 20v3" stroke="#0F1115" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-word">Flex<span>Plugs</span></span>
+    </div>
+    <label class="header-search" for="searchInput">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchInput" type="text" placeholder="Search plugins…" autocomplete="off">
+    </label>
+    <button class="btn btn-ghost chat-btn" id="chatBtn" type="button" title="Chats" aria-label="Chats">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="chat-badge hidden" id="chatBadge">0</span>
+    </button>
+    <div class="header-auth" id="authArea"></div>
+  </div>
+</header>
+
+<section class="hero">
+  <p class="eyebrow">// flixher's plugin catalog</p>
+  <h1>Plugins, built by Flixher.</h1>
+  <p>Browse, favorite, and review every plugin Flixher has shipped. Create a free account to save favorites and leave a rating.</p>
+</section>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="side-block">
+      <h4>Tags</h4>
+      <div class="tag-list" id="tagList"></div>
+    </div>
+    <div class="side-block">
+      <h4>Library</h4>
+      <button class="fav-toggle" id="favToggle" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        My favorites
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="main-top">
+      <span class="result-count" id="resultCount">Loading…</span>
+      <select id="sortSelect">
+        <option value="newest">Sort: newest</option>
+        <option value="rating">Sort: highest rated</option>
+        <option value="favorites">Sort: most favorited</option>
+        <option value="name">Sort: name A–Z</option>
+      </select>
+    </div>
+    <div class="grid" id="grid"></div>
+  </main>
+</div>
+
+<footer>FlexPlugs is a local demo app — all accounts, plugins, and files live only in this browser.</footer>
+
+<button class="fab hidden" id="fabAdd" type="button" title="Add a plugin" aria-label="Add a plugin">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+
+<div id="modalRoot"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   DB LAYER (IndexedDB)
+============================================================ */
+var DB_NAME = "flexplugsDB", DB_VERSION = 2;
+function openDB(){
+  return new Promise(function(resolve, reject){
+    var req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = function(e){
+      var db = e.target.result;
+      if(!db.objectStoreNames.contains("users")) db.createObjectStore("users", {keyPath:"usernameLower"});
+      if(!db.objectStoreNames.contains("plugins")) db.createObjectStore("plugins", {keyPath:"id"});
+      if(!db.objectStoreNames.contains("reviews")) db.createObjectStore("reviews", {keyPath:"id"});
+      if(!db.objectStoreNames.contains("blobs")) db.createObjectStore("blobs", {keyPath:"key"});
+      if(!db.objectStoreNames.contains("friendRequests")) db.createObjectStore("friendRequests", {keyPath:"id"});
+      if(!db.objectStoreNames.contains("chats")) db.createObjectStore("chats", {keyPath:"id"});
+      if(!db.objectStoreNames.contains("messages")) db.createObjectStore("messages", {keyPath:"id"});
+    };
+    req.onsuccess = function(){ resolve(req.result); };
+    req.onerror = function(){ reject(req.error); };
+  });
+}
+var dbPromise = openDB();
+
+function dbGet(store, key){
+  return dbPromise.then(function(db){
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction(store, "readonly");
+      var req = tx.objectStore(store).get(key);
+      req.onsuccess = function(){ resolve(req.result); };
+      req.onerror = function(){ reject(req.error); };
+    });
+  });
+}
+function dbGetAll(store){
+  return dbPromise.then(function(db){
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction(store, "readonly");
+      var req = tx.objectStore(store).getAll();
+      req.onsuccess = function(){ resolve(req.result); };
+      req.onerror = function(){ reject(req.error); };
+    });
+  });
+}
+function dbPut(store, value){
+  return dbPromise.then(function(db){
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction(store, "readwrite");
+      tx.objectStore(store).put(value);
+      tx.oncomplete = function(){ resolve(value); };
+      tx.onerror = function(){ reject(tx.error); };
+    });
+  });
+}
+function dbDelete(store, key){
+  return dbPromise.then(function(db){
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction(store, "readwrite");
+      tx.objectStore(store).delete(key);
+      tx.oncomplete = function(){ resolve(); };
+      tx.onerror = function(){ reject(tx.error); };
+    });
+  });
+}
+
+/* ============================================================
+   UTIL
+============================================================ */
+function uuid(){
+  if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c){
+    var r = Math.random()*16|0, v = c==="x" ? r : (r&0x3|0x8);
+    return v.toString(16);
+  });
+}
+function hashStr(s){
+  var h = 2166136261;
+  for(var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+var AVATAR_COLORS = ["#7C5CFC","#33C481","#E0A93D","#FF6B6B","#4C9BDB","#F2789F","#43D9C8"];
+function avatarColor(name){ return AVATAR_COLORS[hashStr(name||"?") % AVATAR_COLORS.length]; }
+
+function bufToHex(buf){
+  return Array.prototype.map.call(new Uint8Array(buf), function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+}
+function randomSalt(){
+  var arr = new Uint8Array(16);
+  (window.crypto || {}).getRandomValues ? crypto.getRandomValues(arr) : arr.forEach(function(_,i){ arr[i]=Math.floor(Math.random()*256); });
+  return bufToHex(arr);
+}
+function hashPassword(password, saltHex){
+  var salt = saltHex || randomSalt();
+  if(window.crypto && crypto.subtle && crypto.subtle.digest){
+    var enc = new TextEncoder().encode(salt + ":" + password);
+    return crypto.subtle.digest("SHA-256", enc).then(function(digest){
+      return { hash: bufToHex(digest), salt: salt };
+    }).catch(function(){ return fallbackHash(password, salt); });
+  }
+  return Promise.resolve(fallbackHash(password, salt));
+}
+function fallbackHash(password, salt){
+  var s = salt + ":" + password, h = 0;
+  for(var i=0;i<s.length;i++){ h = (Math.imul(31,h) + s.charCodeAt(i)) | 0; }
+  return { hash: "fnv" + h, salt: salt };
+}
+function fmtDate(ts){
+  var d = new Date(ts);
+  return d.toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"});
+}
+function fmtSize(bytes){
+  if(!bytes) return "";
+  var units = ["B","KB","MB","GB"], i=0, n=bytes;
+  while(n >= 1024 && i < units.length-1){ n/=1024; i++; }
+  return n.toFixed(n<10 && i>0 ? 1 : 0) + " " + units[i];
+}
+function toast(msg){
+  var el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function(){ el.classList.remove("show"); }, 3000);
+}
+
+/* ============================================================
+   AUTH
+============================================================ */
+var currentUser = null;
+var SESSION_KEY = "flexplugs_session";
+
+function signUp(username, password, keep){
+  var usernameLower = username.trim().toLowerCase();
+  if(!usernameLower) return Promise.reject(new Error("Enter a username."));
+  if(password.length < 6) return Promise.reject(new Error("Password must be at least 6 characters."));
+  return dbGet("users", usernameLower).then(function(existing){
+    if(existing) throw new Error("That username is already taken.");
+    return hashPassword(password);
+  }).then(function(res){
+    var isAdmin = usernameLower === "flixher";
+    var user = {
+      usernameLower: usernameLower, username: username.trim(), passwordHash: res.hash, salt: res.salt,
+      isAdmin: isAdmin, favorites: [], friends: [], blocked: [], joinedAt: Date.now()
+    };
+    return dbPut("users", user);
+  }).then(function(user){
+    setSession(user, keep);
+    return user;
+  });
+}
+function signIn(username, password, keep){
+  var usernameLower = username.trim().toLowerCase();
+  return dbGet("users", usernameLower).then(function(user){
+    if(!user) throw new Error("No account with that username.");
+    return hashPassword(password, user.salt).then(function(res){
+      if(res.hash !== user.passwordHash) throw new Error("Incorrect password.");
+      return user;
+    });
+  }).then(function(user){
+    setSession(user, keep);
+    return user;
+  });
+}
+function ensureUserShape(user){
+  if(user){
+    if(!Array.isArray(user.friends)) user.friends = [];
+    if(!Array.isArray(user.blocked)) user.blocked = [];
+  }
+  return user;
+}
+function setSession(user, keep){
+  currentUser = ensureUserShape(user);
+  try{
+    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
+    (keep ? localStorage : sessionStorage).setItem(SESSION_KEY, user.usernameLower);
+  }catch(e){}
+}
+function signOut(){
+  currentUser = null;
+  try{ localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY); }catch(e){}
+  renderAll();
+  toast("Signed out.");
+}
+function restoreSession(){
+  var name;
+  try{ name = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY); }catch(e){}
+  if(!name) return Promise.resolve();
+  return dbGet("users", name).then(function(user){ if(user) currentUser = ensureUserShape(user); });
+}
+
+/* ============================================================
+   APP STATE
+============================================================ */
+var allPlugins = [];
+var allReviews = [];
+var imageUrlCache = new Map();
+var activeTags = new Set();
+var searchQuery = "";
+var sortBy = "newest";
+var favoritesOnly = false;
+
+function loadAll(){
+  return Promise.all([dbGetAll("plugins"), dbGetAll("reviews")]).then(function(res){
+    allPlugins = res[0]; allReviews = res[1];
+    var keys = allPlugins.map(function(p){ return p.imageKey; }).filter(Boolean);
+    return Promise.all(keys.map(function(key){
+      if(imageUrlCache.has(key)) return null;
+      return dbGet("blobs", key).then(function(rec){
+        if(rec && rec.blob) imageUrlCache.set(key, URL.createObjectURL(rec.blob));
+      });
+    }));
+  });
+}
+
+function reviewsFor(pluginId){ return allReviews.filter(function(r){ return r.pluginId === pluginId; }); }
+function avgRating(pluginId){
+  var rs = reviewsFor(pluginId);
+  if(rs.length === 0) return 0;
+  return rs.reduce(function(a,r){ return a + r.rating; }, 0) / rs.length;
+}
+
+/* ============================================================
+   RENDER: header / auth
+============================================================ */
+function renderAuthArea(){
+  var area = document.getElementById("authArea");
+  area.innerHTML = "";
+  if(!currentUser){
+    var btn = document.createElement("button");
+    btn.className = "btn btn-primary";
+    btn.type = "button";
+    btn.textContent = "Sign in";
+    btn.addEventListener("click", function(){ openAuthModal("signin"); });
+    area.appendChild(btn);
+    return;
+  }
+  var wrap = document.createElement("div");
+  wrap.style.position = "relative";
+
+  var avBtn = document.createElement("button");
+  avBtn.className = "avatar-btn";
+  avBtn.type = "button";
+  var av = document.createElement("span");
+  av.className = "avatar";
+  av.style.background = avatarColor(currentUser.username);
+  av.textContent = currentUser.username.charAt(0).toUpperCase();
+  avBtn.appendChild(av);
+  var nm = document.createElement("span");
+  nm.className = "name";
+  nm.textContent = currentUser.username;
+  avBtn.appendChild(nm);
+  if(currentUser.isAdmin){
+    var tag = document.createElement("span");
+    tag.className = "admin-tag";
+    tag.textContent = "ADMIN";
+    avBtn.appendChild(tag);
+  }
+  wrap.appendChild(avBtn);
+
+  var dd = document.createElement("div");
+  dd.className = "dropdown hidden";
+  var meta = document.createElement("div");
+  meta.className = "dd-meta";
+  meta.textContent = "Signed in as " + currentUser.username;
+  dd.appendChild(meta);
+
+  var favItem = document.createElement("button");
+  favItem.className = "dd-item";
+  favItem.type = "button";
+  favItem.textContent = "★ My favorites (" + currentUser.favorites.length + ")";
+  favItem.addEventListener("click", function(){
+    favoritesOnly = true;
+    document.getElementById("favToggle").classList.add("active");
+    dd.classList.add("hidden");
+    renderGrid();
+  });
+  dd.appendChild(favItem);
+
+  var signOutItem = document.createElement("button");
+  signOutItem.className = "dd-item";
+  signOutItem.type = "button";
+  signOutItem.textContent = "Sign out";
+  signOutItem.addEventListener("click", signOut);
+  dd.appendChild(signOutItem);
+
+  wrap.appendChild(dd);
+  avBtn.addEventListener("click", function(e){
+    e.stopPropagation();
+    dd.classList.toggle("hidden");
+  });
+  document.addEventListener("click", function(){ dd.classList.add("hidden"); });
+
+  area.appendChild(wrap);
+}
+
+/* ============================================================
+   RENDER: tags / sidebar
+============================================================ */
+function buildTagCounts(){
+  var counts = {};
+  allPlugins.forEach(function(p){ (p.tags||[]).forEach(function(t){ counts[t] = (counts[t]||0)+1; }); });
+  return counts;
+}
+function renderTagList(){
+  var counts = buildTagCounts();
+  var sorted = Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; });
+  var container = document.getElementById("tagList");
+  container.innerHTML = "";
+  if(sorted.length === 0){
+    var none = document.createElement("div");
+    none.style.cssText = "font-size:12px;color:var(--faint);padding:6px 8px;";
+    none.textContent = "No tags yet.";
+    container.appendChild(none);
+    return;
+  }
+  sorted.forEach(function(tag){
+    var row = document.createElement("button");
+    row.type = "button";
+    row.className = "tag-row" + (activeTags.has(tag) ? " active" : "");
+    var label = document.createElement("span");
+    label.textContent = tag;
+    var n = document.createElement("span");
+    n.className = "n";
+    n.textContent = counts[tag];
+    row.appendChild(label); row.appendChild(n);
+    row.addEventListener("click", function(){
+      if(activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+      renderTagList();
+      renderGrid();
+    });
+    container.appendChild(row);
+  });
+}
+
+/* ============================================================
+   RENDER: star rating (display)
+============================================================ */
+function starRow(rating, size){
+  var pct = Math.max(0, Math.min(100, (rating/5)*100));
+  var wrap = document.createElement("span");
+  wrap.className = "star-row";
+  if(size) wrap.style.fontSize = size + "px";
+  var base = document.createElement("span");
+  base.className = "star-row-base";
+  base.textContent = "★★★★★";
+  var fill = document.createElement("span");
+  fill.className = "star-row-fill";
+  fill.textContent = "★★★★★";
+  fill.style.width = pct + "%";
+  wrap.appendChild(base); wrap.appendChild(fill);
+  return wrap;
+}
+
+/* ============================================================
+   FILTER + SORT + GRID
+============================================================ */
+function getFiltered(){
+  var q = searchQuery.trim().toLowerCase();
+  var list = allPlugins.filter(function(p){
+    if(favoritesOnly && (!currentUser || currentUser.favorites.indexOf(p.id) === -1)) return false;
+    if(activeTags.size > 0){
+      var has = (p.tags||[]).some(function(t){ return activeTags.has(t); });
+      if(!has) return false;
+    }
+    if(q){
+      var hay = (p.name + " " + p.description).toLowerCase();
+      if(hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+  list.sort(function(a,b){
+    switch(sortBy){
+      case "rating": return avgRating(b.id) - avgRating(a.id);
+      case "favorites": return (b.favoriteCount||0) - (a.favoriteCount||0);
+      case "name": return a.name.localeCompare(b.name);
+      case "newest":
+      default: return b.createdAt - a.createdAt;
+    }
+  });
+  return list;
+}
+
+function buildCard(plugin){
+  var card = document.createElement("article");
+  card.className = "card";
+
+  var img = document.createElement("img");
+  img.className = "card-img";
+  img.loading = "lazy";
+  img.src = imageUrlCache.get(plugin.imageKey) || "";
+  img.alt = plugin.name;
+  card.appendChild(img);
+
+  var body = document.createElement("div");
+  body.className = "card-body";
+
+  var h3 = document.createElement("h3");
+  h3.textContent = plugin.name;
+  body.appendChild(h3);
+
+  var author = document.createElement("div");
+  author.className = "card-author";
+  author.innerHTML = "";
+  author.append("by " + plugin.author);
+  if(plugin.author && plugin.author.toLowerCase() === "flixher"){
+    var dot = document.createElement("span");
+    dot.className = "admin-dot";
+    dot.textContent = " • admin";
+    author.appendChild(dot);
+  }
+  body.appendChild(author);
+
+  var desc = document.createElement("p");
+  desc.className = "card-desc";
+  desc.textContent = plugin.description;
+  body.appendChild(desc);
+
+  var tagsWrap = document.createElement("div");
+  tagsWrap.className = "card-tags";
+  (plugin.tags||[]).slice(0,3).forEach(function(t){
+    var pill = document.createElement("span");
+    pill.className = "pill";
+    pill.textContent = t;
+    tagsWrap.appendChild(pill);
+  });
+  if((plugin.tags||[]).length > 3){
+    var more = document.createElement("span");
+    more.className = "pill";
+    more.textContent = "+" + (plugin.tags.length - 3);
+    tagsWrap.appendChild(more);
+  }
+  body.appendChild(tagsWrap);
+
+  var foot = document.createElement("div");
+  foot.className = "card-foot";
+  var ratingWrap = document.createElement("div");
+  ratingWrap.style.display = "flex"; ratingWrap.style.alignItems = "center";
+  var avg = avgRating(plugin.id);
+  var count = reviewsFor(plugin.id).length;
+  ratingWrap.appendChild(starRow(avg));
+  var num = document.createElement("span");
+  num.className = "rating-num";
+  num.textContent = count ? avg.toFixed(1) + " (" + count + ")" : "No reviews";
+  ratingWrap.appendChild(num);
+  foot.appendChild(ratingWrap);
+
+  var actions = document.createElement("div");
+  actions.className = "card-actions";
+  var isFav = currentUser && currentUser.favorites.indexOf(plugin.id) !== -1;
+  var favBtn = document.createElement("button");
+  favBtn.className = "icon-btn" + (isFav ? " fav-active" : "");
+  favBtn.type = "button";
+  favBtn.title = "Favorite";
+  favBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="' + (isFav ? "currentColor" : "none") + '" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+  favBtn.addEventListener("click", function(e){ e.stopPropagation(); toggleFavorite(plugin.id); });
+  actions.appendChild(favBtn);
+  foot.appendChild(actions);
+  body.appendChild(foot);
+
+  card.appendChild(body);
+  card.addEventListener("click", function(){ openPluginDetail(plugin.id); });
+  return card;
+}
+
+function renderGrid(){
+  var filtered = getFiltered();
+  var grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  if(filtered.length === 0){
+    var empty = document.createElement("div");
+    empty.className = "empty-state";
+    var h3 = document.createElement("h3");
+    var p = document.createElement("p");
+    if(allPlugins.length === 0){
+      h3.textContent = "No plugins published yet";
+      p.textContent = currentUser && currentUser.isAdmin
+        ? "Use the + button in the corner to publish your first plugin."
+        : "Check back soon — Flixher hasn't published anything yet.";
+    } else {
+      h3.textContent = "No plugins match your filters";
+      p.textContent = "Try a different search term or clear a tag filter.";
+    }
+    empty.appendChild(h3); empty.appendChild(p);
+    grid.appendChild(empty);
+  } else {
+    filtered.forEach(function(p){ grid.appendChild(buildCard(p)); });
+  }
+  document.getElementById("resultCount").textContent =
+    filtered.length.toLocaleString() + " plugin" + (filtered.length===1?"":"s");
+}
+
+function toggleFavorite(pluginId){
+  if(!currentUser){ openAuthModal("signin"); toast("Sign in to save favorites."); return; }
+  var plugin = allPlugins.find(function(p){ return p.id === pluginId; });
+  if(!plugin) return;
+  var idx = currentUser.favorites.indexOf(pluginId);
+  if(idx === -1){
+    currentUser.favorites.push(pluginId);
+    plugin.favoriteCount = (plugin.favoriteCount||0) + 1;
+  } else {
+    currentUser.favorites.splice(idx,1);
+    plugin.favoriteCount = Math.max(0, (plugin.favoriteCount||0) - 1);
+  }
+  Promise.all([dbPut("users", currentUser), dbPut("plugins", plugin)]).then(function(){
+    renderAuthArea();
+    renderGrid();
+  });
+}
+
+/* ============================================================
+   PLUGIN DETAIL MODAL
+============================================================ */
+function openPluginDetail(pluginId){
+  var plugin = allPlugins.find(function(p){ return p.id === pluginId; });
+  if(!plugin) return;
+
+  var overlay = document.createElement("div");
+  overlay.className = "overlay";
+  var modal = document.createElement("div");
+  modal.className = "modal wide";
+  overlay.appendChild(modal);
+  overlay.addEventListener("click", function(e){ if(e.target === overlay) closeModal(overlay); });
+
+  function build(){
+    modal.innerHTML = "";
+    var head = document.createElement("div");
+    head.className = "modal-head";
+    var spacer = document.createElement("div");
+    var closeBtn = document.createElement("button");
+    closeBtn.className = "modal-close"; closeBtn.type = "button"; closeBtn.setAttribute("aria-label","Close");
+    closeBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    closeBtn.addEventListener("click", function(){ closeModal(overlay); });
+    head.appendChild(spacer); head.appendChild(closeBtn);
+    modal.appendChild(head);
+
+    var dHead = document.createElement("div");
+    dHead.className = "detail-head";
+    var img = document.createElement("img");
+    img.className = "detail-img";
+    img.src = imageUrlCache.get(plugin.imageKey) || "";
+    img.alt = plugin.name;
+    dHead.appendChild(img);
+
+    var titleWrap = document.createElement("div");
+    titleWrap.className = "detail-title";
+    var h2 = document.createElement("h2");
+    h2.textContent = plugin.name;
+    titleWrap.appendChild(h2);
+    var author = document.createElement("div");
+    author.className = "detail-author";
+    author.textContent = "by " + plugin.author + (plugin.author.toLowerCase()==="flixher" ? " • admin" : "") + " · " + fmtDate(plugin.createdAt);
+    titleWrap.appendChild(author);
+
+    var ratingLine = document.createElement("div");
+    ratingLine.className = "detail-rating";
+    var avg = avgRating(plugin.id); var count = reviewsFor(plugin.id).length;
+    ratingLine.appendChild(starRow(avg, 16));
+    var num = document.createElement("span");
+    num.className = "rating-num";
+    num.textContent = count ? avg.toFixed(1) + " · " + count + " review" + (count===1?"":"s") : "No reviews yet";
+    ratingLine.appendChild(num);
+    titleWrap.appendChild(ratingLine);
+
+    var tagsWrap = document.createElement("div");
+    tagsWrap.className = "detail-tags";
+    (plugin.tags||[]).forEach(function(t){
+      var pill = document.createElement("span"); pill.className = "pill"; pill.textContent = t;
+      tagsWrap.appendChild(pill);
+    });
+    titleWrap.appendChild(tagsWrap);
+
+    var actions = document.createElement("div");
+    actions.className = "detail-actions";
+    var isFav = currentUser && currentUser.favorites.indexOf(plugin.id) !== -1;
+    var favBtn = document.createElement("button");
+    favBtn.className = "btn btn-sm" + (isFav ? "" : "");
+    favBtn.style.background = isFav ? "rgba(255,200,87,.14)" : "";
+    favBtn.style.borderColor = isFav ? "var(--gold)" : "";
+    favBtn.style.color = isFav ? "var(--gold)" : "";
+    favBtn.type = "button";
+    favBtn.textContent = isFav ? "★ Favorited" : "☆ Favorite";
+    favBtn.addEventListener("click", function(){ toggleFavorite(plugin.id); build(); });
+    actions.appendChild(favBtn);
+
+    var dlBtn = document.createElement("button");
+    dlBtn.className = "btn btn-sm btn-primary";
+    dlBtn.type = "button";
+    dlBtn.textContent = "Download (" + fmtSize(plugin.fileSize) + ")";
+    dlBtn.addEventListener("click", function(){ downloadPlugin(plugin.id); });
+    actions.appendChild(dlBtn);
+
+    if(currentUser && currentUser.isAdmin){
+      var delBtn = document.createElement("button");
+      delBtn.className = "btn btn-sm btn-danger";
+      delBtn.type = "button";
+      delBtn.textContent = "Delete plugin";
+      delBtn.addEventListener("click", function(){
+        if(confirm('Delete "' + plugin.name + '"? This cannot be undone.')){
+          deletePlugin(plugin.id).then(function(){ closeModal(overlay); });
+        }
+      });
+      actions.appendChild(delBtn);
+    }
+    titleWrap.appendChild(actions);
+    dHead.appendChild(titleWrap);
+    modal.appendChild(dHead);
+
+    var desc = document.createElement("div");
+    desc.className = "detail-desc";
+    desc.textContent = plugin.description;
+    modal.appendChild(desc);
+
+    var reviewTitle = document.createElement("div");
+    reviewTitle.className = "section-title";
+    reviewTitle.textContent = "Reviews";
+    modal.appendChild(reviewTitle);
+
+    if(currentUser){
+      var mine = reviewsFor(plugin.id).find(function(r){ return r.usernameLower === currentUser.usernameLower; });
+      var formWrap = document.createElement("div");
+      var formLabel = document.createElement("label");
+      formLabel.style.cssText = "display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:8px;";
+      formLabel.textContent = mine ? "Update your review" : "Write a review";
+      formWrap.appendChild(formLabel);
+
+      var ratingInput = buildRatingInput(mine ? mine.rating : 0);
+      formWrap.appendChild(ratingInput);
+
+      var textarea = document.createElement("textarea");
+      textarea.style.marginTop = "10px";
+      textarea.style.width = "100%";
+      textarea.style.background = "var(--surface-2)";
+      textarea.style.border = "1px solid var(--border)";
+      textarea.style.color = "var(--text)";
+      textarea.style.borderRadius = "8px";
+      textarea.style.padding = "10px 12px";
+      textarea.style.minHeight = "70px";
+      textarea.style.fontFamily = "var(--f-body)";
+      textarea.placeholder = "What did you think?";
+      textarea.value = mine ? mine.text : "";
+      formWrap.appendChild(textarea);
+
+      var submitBtn = document.createElement("button");
+      submitBtn.className = "btn btn-primary btn-sm";
+      submitBtn.type = "button";
+      submitBtn.style.marginTop = "10px";
+      submitBtn.textContent = mine ? "Update review" : "Submit review";
+      submitBtn.addEventListener("click", function(){
+        var rating = ratingInput._value;
+        if(!rating){ toast("Pick a star rating first."); return; }
+        submitReview(plugin.id, rating, textarea.value).then(function(){
+          toast("Review saved.");
+          build();
+          renderGrid();
+        });
+      });
+      formWrap.appendChild(submitBtn);
+      modal.appendChild(formWrap);
+    } else {
+      var prompt = document.createElement("div");
+      prompt.className = "signin-prompt";
+      var pBtn = document.createElement("button");
+      pBtn.className = "btn btn-primary btn-sm";
+      pBtn.type = "button";
+      pBtn.textContent = "Sign in to write a review";
+      pBtn.style.marginTop = "8px";
+      pBtn.addEventListener("click", function(){ openAuthModal("signin"); });
+      prompt.textContent = "Sign in to rate and review this plugin.";
+      prompt.appendChild(document.createElement("br"));
+      prompt.appendChild(pBtn);
+      modal.appendChild(prompt);
+    }
+
+    var list = document.createElement("div");
+    list.style.marginTop = "14px";
+    var revs = reviewsFor(plugin.id).sort(function(a,b){ return b.createdAt - a.createdAt; });
+    if(revs.length === 0){
+      var noRev = document.createElement("p");
+      noRev.style.cssText = "color:var(--faint);font-size:13px;";
+      noRev.textContent = "No reviews yet — be the first.";
+      list.appendChild(noRev);
+    }
+    revs.forEach(function(r){
+      var row = document.createElement("div");
+      row.className = "review";
+      var top = document.createElement("div");
+      top.className = "review-top";
+      var av = document.createElement("span");
+      av.className = "avatar";
+      av.style.background = avatarColor(r.username);
+      av.textContent = r.username.charAt(0).toUpperCase();
+      top.appendChild(av);
+      var name = document.createElement("span");
+      name.className = "review-name";
+      name.textContent = r.username;
+      top.appendChild(name);
+      top.appendChild(starRow(r.rating, 12));
+      var date = document.createElement("span");
+      date.className = "review-date";
+      date.textContent = fmtDate(r.createdAt);
+      top.appendChild(date);
+      row.appendChild(top);
+      if(r.text){
+        var txt = document.createElement("div");
+        txt.className = "review-text";
+        txt.textContent = r.text;
+        row.appendChild(txt);
+      }
+      if(currentUser && (currentUser.usernameLower === r.usernameLower || currentUser.isAdmin)){
+        var del = document.createElement("button");
+        del.className = "review-del";
+        del.type = "button";
+        del.textContent = "Delete review";
+        del.addEventListener("click", function(){
+          deleteReview(r.id).then(function(){ build(); renderGrid(); });
+        });
+        row.appendChild(del);
+      }
+      list.appendChild(row);
+    });
+    modal.appendChild(list);
+  }
+
+  build();
+  document.getElementById("modalRoot").appendChild(overlay);
+}
+
+function buildRatingInput(initial){
+  var wrap = document.createElement("div");
+  wrap.className = "rating-input";
+  wrap._value = initial || 0;
+  var stars = [];
+  function paint(n){ stars.forEach(function(s, idx){ s.classList.toggle("filled", idx < n); }); }
+  for(var i=1;i<=5;i++){
+    (function(i){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "rating-star";
+      btn.textContent = "★";
+      btn.setAttribute("aria-label", i + " star" + (i===1?"":"s"));
+      btn.addEventListener("mouseenter", function(){ paint(i); });
+      btn.addEventListener("mouseleave", function(){ paint(wrap._value); });
+      btn.addEventListener("click", function(){ wrap._value = i; paint(i); });
+      stars.push(btn);
+      wrap.appendChild(btn);
+    })(i);
+  }
+  paint(wrap._value);
+  return wrap;
+}
+
+function submitReview(pluginId, rating, text){
+  var existing = allReviews.find(function(r){ return r.pluginId === pluginId && r.usernameLower === currentUser.usernameLower; });
+  var review = existing || { id: uuid(), pluginId: pluginId, usernameLower: currentUser.usernameLower };
+  review.username = currentUser.username;
+  review.rating = rating;
+  review.text = (text||"").trim();
+  review.createdAt = Date.now();
+  return dbPut("reviews", review).then(function(){
+    var idx = allReviews.findIndex(function(r){ return r.id === review.id; });
+    if(idx >= 0) allReviews[idx] = review; else allReviews.push(review);
+  });
+}
+function deleteReview(reviewId){
+  return dbDelete("reviews", reviewId).then(function(){
+    allReviews = allReviews.filter(function(r){ return r.id !== reviewId; });
+  });
+}
+function deletePlugin(pluginId){
+  var plugin = allPlugins.find(function(p){ return p.id === pluginId; });
+  if(!plugin) return Promise.resolve();
+  var jobs = [];
+  if(plugin.imageKey) jobs.push(dbDelete("blobs", plugin.imageKey));
+  if(plugin.fileKey) jobs.push(dbDelete("blobs", plugin.fileKey));
+  reviewsFor(pluginId).forEach(function(r){ jobs.push(dbDelete("reviews", r.id)); });
+  jobs.push(dbDelete("plugins", pluginId));
+  return Promise.all(jobs).then(function(){
+    allPlugins = allPlugins.filter(function(p){ return p.id !== pluginId; });
+    allReviews = allReviews.filter(function(r){ return r.pluginId !== pluginId; });
+    renderTagList(); renderGrid();
+    toast("Plugin deleted.");
+  });
+}
+function downloadPlugin(pluginId){
+  var plugin = allPlugins.find(function(p){ return p.id === pluginId; });
+  if(!plugin) return;
+  dbGet("blobs", plugin.fileKey).then(function(rec){
+    if(!rec){ toast("File not found."); return; }
+    var url = URL.createObjectURL(rec.blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = plugin.fileName || (plugin.name + ".zip");
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  });
+}
+
+/* ============================================================
+   MODALS: close helper
+============================================================ */
+function closeModal(overlay){
+  overlay.remove();
+}
+document.addEventListener("keydown", function(e){
+  if(e.key === "Escape"){
+    var overlays = document.querySelectorAll(".overlay");
+    if(overlays.length) closeModal(overlays[overlays.length-1]);
+  }
+});
+
+/* ============================================================
+   AUTH MODAL
+============================================================ */
+function openAuthModal(initialTab){
+  var overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.addEventListener("click", function(e){ if(e.target === overlay) closeModal(overlay); });
+  var modal = document.createElement("div");
+  modal.className = "modal";
+  overlay.appendChild(modal);
+
+  var head = document.createElement("div");
+  head.className = "modal-head";
+  var h2 = document.createElement("h2"); h2.textContent = "Welcome to FlexPlugs";
+  var closeBtn = document.createElement("button");
+  closeBtn.className = "modal-close"; closeBtn.type = "button"; closeBtn.setAttribute("aria-label","Close");
+  closeBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  closeBtn.addEventListener("click", function(){ closeModal(overlay); });
+  head.appendChild(h2); head.appendChild(closeBtn);
+  modal.appendChild(head);
+
+  var tabs = document.createElement("div");
+  tabs.className = "tabs";
+  var tabSignIn = document.createElement("button");
+  tabSignIn.className = "tab-btn"; tabSignIn.type = "button"; tabSignIn.textContent = "Sign in";
+  var tabSignUp = document.createElement("button");
+  tabSignUp.className = "tab-btn"; tabSignUp.type = "button"; tabSignUp.textContent = "Create account";
+  tabs.appendChild(tabSignIn); tabs.appendChild(tabSignUp);
+  modal.appendChild(tabs);
+
+  var errorBox = document.createElement("div");
+  errorBox.className = "form-error";
+  modal.appendChild(errorBox);
+
+  var formHost = document.createElement("div");
+  modal.appendChild(formHost);
+
+  function makePwField(id){
+    var wrap = document.createElement("div");
+    wrap.className = "pw-wrap";
+    var input = document.createElement("input");
+    input.type = "password"; input.id = id; input.autocomplete = "current-password";
+    var toggle = document.createElement("button");
+    toggle.type = "button"; toggle.className = "pw-toggle";
+    toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    toggle.addEventListener("click", function(){
+      input.type = input.type === "password" ? "text" : "password";
+    });
+    wrap.appendChild(input); wrap.appendChild(toggle);
+    return { wrap: wrap, input: input };
+  }
+
+  function buildSignIn(){
+    errorBox.textContent = "";
+    formHost.innerHTML = "";
+    var userField = document.createElement("div"); userField.className = "field";
+    var userLabel = document.createElement("label"); userLabel.textContent = "Username";
+    var userInput = document.createElement("input"); userInput.type = "text"; userInput.autocomplete = "username";
+    userField.appendChild(userLabel); userField.appendChild(userInput);
+
+    var pwField = document.createElement("div"); pwField.className = "field";
+    var pwLabel = document.createElement("label"); pwLabel.textContent = "Password";
+    var pw = makePwField("signinPw");
+    pwField.appendChild(pwLabel); pwField.appendChild(pw.wrap);
+
+    var keepLine = document.createElement("label"); keepLine.className = "checkline";
+    var keepBox = document.createElement("input"); keepBox.type = "checkbox"; keepBox.checked = true;
+    keepLine.appendChild(keepBox);
+    keepLine.appendChild(document.createTextNode("Keep me signed in on this device"));
+
+    var submit = document.createElement("button");
+    submit.className = "btn btn-primary"; submit.type = "button"; submit.style.width = "100%";
+    submit.textContent = "Sign in";
+    submit.addEventListener("click", function(){
+      errorBox.textContent = "";
+      signIn(userInput.value, pw.input.value, keepBox.checked).then(function(user){
+        closeModal(overlay);
+        toast("Welcome back, " + user.username + "!");
+        renderAll();
+      }).catch(function(err){ errorBox.textContent = err.message; });
+    });
+
+    formHost.appendChild(userField); formHost.appendChild(pwField); formHost.appendChild(keepLine); formHost.appendChild(submit);
+    userInput.focus();
+  }
+
+  function buildSignUp(){
+    errorBox.textContent = "";
+    formHost.innerHTML = "";
+    var userField = document.createElement("div"); userField.className = "field";
+    var userLabel = document.createElement("label"); userLabel.textContent = "Username";
+    var userInput = document.createElement("input"); userInput.type = "text"; userInput.autocomplete = "username";
+    userField.appendChild(userLabel); userField.appendChild(userInput);
+
+    var pwField = document.createElement("div"); pwField.className = "field";
+    var pwLabel = document.createElement("label"); pwLabel.textContent = "Password";
+    var pw = makePwField("signupPw");
+    pw.input.autocomplete = "new-password";
+    var pwHint = document.createElement("div"); pwHint.className = "hint"; pwHint.textContent = "At least 6 characters.";
+    pwField.appendChild(pwLabel); pwField.appendChild(pw.wrap); pwField.appendChild(pwHint);
+
+    var keepLine = document.createElement("label"); keepLine.className = "checkline";
+    var keepBox = document.createElement("input"); keepBox.type = "checkbox"; keepBox.checked = true;
+    keepLine.appendChild(keepBox);
+    keepLine.appendChild(document.createTextNode("Keep me signed in on this device"));
+
+    var submit = document.createElement("button");
+    submit.className = "btn btn-primary"; submit.type = "button"; submit.style.width = "100%";
+    submit.textContent = "Create account";
+    submit.addEventListener("click", function(){
+      errorBox.textContent = "";
+      signUp(userInput.value, pw.input.value, keepBox.checked).then(function(user){
+        closeModal(overlay);
+        toast(user.isAdmin ? "Welcome, " + user.username + " — admin account claimed!" : "Welcome, " + user.username + "!");
+        renderAll();
+      }).catch(function(err){ errorBox.textContent = err.message; });
+    });
+
+    formHost.appendChild(userField); formHost.appendChild(pwField); formHost.appendChild(keepLine); formHost.appendChild(submit);
+    userInput.focus();
+  }
+
+  function selectTab(which){
+    tabSignIn.classList.toggle("active", which === "signin");
+    tabSignUp.classList.toggle("active", which === "signup");
+    if(which === "signin") buildSignIn(); else buildSignUp();
+  }
+  tabSignIn.addEventListener("click", function(){ selectTab("signin"); });
+  tabSignUp.addEventListener("click", function(){ selectTab("signup"); });
+  selectTab(initialTab || "signin");
+
+  document.getElementById("modalRoot").appendChild(overlay);
+}
+
+/* ============================================================
+   ADD PLUGIN MODAL (admin only)
+============================================================ */
+function openAddPluginModal(){
+  if(!currentUser || !currentUser.isAdmin) return;
+  var overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.addEventListener("click", function(e){ if(e.target === overlay) closeModal(overlay); });
+  var modal = document.createElement("div");
+  modal.className = "modal";
+  overlay.appendChild(modal);
+
+  var head = document.createElement("div");
+  head.className = "modal-head";
+  var h2 = document.createElement("h2"); h2.textContent = "Publish a plugin";
+  var closeBtn = document.createElement("button");
+  closeBtn.className = "modal-close"; closeBtn.type = "button"; closeBtn.setAttribute("aria-label","Close");
+  closeBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  closeBtn.addEventListener("click", function(){ closeModal(overlay); });
+  head.appendChild(h2); head.appendChild(closeBtn);
+  modal.appendChild(head);
+
+  var errorBox = document.createElement("div");
+  errorBox.className = "form-error";
+  modal.appendChild(errorBox);
+
+  // Name
+  var nameField = document.createElement("div"); nameField.className = "field";
+  var nameLabel = document.createElement("label"); nameLabel.textContent = "Plugin name";
+  var nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.placeholder = "e.g. AutoClaim";
+  nameField.appendChild(nameLabel); nameField.appendChild(nameInput);
+  modal.appendChild(nameField);
+
+  // Description
+  var descField = document.createElement("div"); descField.className = "field";
+  var descLabel = document.createElement("label"); descLabel.textContent = "Description";
+  var descInput = document.createElement("textarea"); descInput.placeholder = "What does this plugin do?";
+  descField.appendChild(descLabel); descField.appendChild(descInput);
+  modal.appendChild(descField);
+
+  // Tags
+  var tagField = document.createElement("div"); tagField.className = "field";
+  var tagLabel = document.createElement("label"); tagLabel.textContent = "Tags";
+  var tagWrap = document.createElement("div"); tagWrap.className = "tag-input-wrap";
+  var tags = [];
+  var tagInput = document.createElement("input"); tagInput.type = "text"; tagInput.placeholder = "Type a tag and press Enter";
+  function renderTagChips(){
+    Array.from(tagWrap.querySelectorAll(".tag-chip")).forEach(function(c){ c.remove(); });
+    tags.forEach(function(t, i){
+      var chip = document.createElement("span"); chip.className = "tag-chip";
+      chip.appendChild(document.createTextNode(t));
+      var rm = document.createElement("button"); rm.type = "button";
+      rm.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+      rm.addEventListener("click", function(){ tags.splice(i,1); renderTagChips(); });
+      chip.appendChild(rm);
+      tagWrap.insertBefore(chip, tagInput);
+    });
+  }
+  tagInput.addEventListener("keydown", function(e){
+    if((e.key === "Enter" || e.key === ",") && tagInput.value.trim()){
+      e.preventDefault();
+      var val = tagInput.value.trim().replace(/,$/,"");
+      if(val && tags.map(function(t){return t.toLowerCase();}).indexOf(val.toLowerCase()) === -1){
+        tags.push(val);
+        renderTagChips();
+      }
+      tagInput.value = "";
+    } else if(e.key === "Backspace" && !tagInput.value && tags.length){
+      tags.pop(); renderTagChips();
+    }
+  });
+  tagWrap.appendChild(tagInput);
+  tagField.appendChild(tagLabel); tagField.appendChild(tagWrap);
+  var tagHint = document.createElement("div"); tagHint.className = "hint"; tagHint.textContent = "Press Enter or comma to add a tag.";
+  tagField.appendChild(tagHint);
+  modal.appendChild(tagField);
+
+  // Picture
+  var imgField = document.createElement("div"); imgField.className = "field";
+  var imgLabel = document.createElement("label"); imgLabel.textContent = "Picture";
+  var imgDrop = document.createElement("div"); imgDrop.className = "file-drop";
+  var imgPreview = document.createElement("div"); imgPreview.className = "file-icon";
+  imgPreview.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+  var imgPickBtn = document.createElement("button"); imgPickBtn.type = "button"; imgPickBtn.className = "btn btn-sm"; imgPickBtn.textContent = "Choose image";
+  var imgFileInput = document.createElement("input"); imgFileInput.type = "file"; imgFileInput.accept = "image/*"; imgFileInput.className = "hidden";
+  var imgFileObj = null;
+  imgPickBtn.addEventListener("click", function(){ imgFileInput.click(); });
+  imgFileInput.addEventListener("change", function(){
+    var f = imgFileInput.files[0];
+    if(!f) return;
+    imgFileObj = f;
+    var url = URL.createObjectURL(f);
+    imgPreview.innerHTML = "";
+    var im = document.createElement("img"); im.src = url;
+    imgPreview.replaceWith(im); im.id = "imgPreviewImg"; imgPreview = im;
+    imgPickBtn.textContent = "Change image";
+  });
+  imgDrop.appendChild(imgPreview); imgDrop.appendChild(imgPickBtn); imgDrop.appendChild(imgFileInput);
+  imgField.appendChild(imgLabel); imgField.appendChild(imgDrop);
+  modal.appendChild(imgField);
+
+  // Plugin file
+  var fileField = document.createElement("div"); fileField.className = "field";
+  var fileLabel = document.createElement("label"); fileLabel.textContent = "Plugin file";
+  var fileDrop = document.createElement("div"); fileDrop.className = "file-drop";
+  var fileIcon = document.createElement("div"); fileIcon.className = "file-icon";
+  fileIcon.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+  var fileNameSpan = document.createElement("div"); fileNameSpan.className = "fname"; fileNameSpan.textContent = "No file chosen";
+  var filePickBtn = document.createElement("button"); filePickBtn.type = "button"; filePickBtn.className = "btn btn-sm"; filePickBtn.textContent = "Choose file";
+  var pluginFileInput = document.createElement("input"); pluginFileInput.type = "file"; pluginFileInput.className = "hidden";
+  var pluginFileObj = null;
+  filePickBtn.addEventListener("click", function(){ pluginFileInput.click(); });
+  pluginFileInput.addEventListener("change", function(){
+    var f = pluginFileInput.files[0];
+    if(!f) return;
+    pluginFileObj = f;
+    fileNameSpan.textContent = f.name + " · " + fmtSize(f.size);
+    filePickBtn.textContent = "Change file";
+  });
+  fileDrop.appendChild(fileIcon); fileDrop.appendChild(fileNameSpan); fileDrop.appendChild(filePickBtn); fileDrop.appendChild(pluginFileInput);
+  fileField.appendChild(fileLabel); fileField.appendChild(fileDrop);
+  modal.appendChild(fileField);
+
+  var submit = document.createElement("button");
+  submit.className = "btn btn-primary"; submit.type = "button"; submit.style.width = "100%";
+  submit.textContent = "Publish plugin";
+  submit.addEventListener("click", function(){
+    errorBox.textContent = "";
+    if(!nameInput.value.trim()){ errorBox.textContent = "Give the plugin a name."; return; }
+    if(!descInput.value.trim()){ errorBox.textContent = "Add a short description."; return; }
+    if(tags.length === 0){ errorBox.textContent = "Add at least one tag."; return; }
+    if(!imgFileObj){ errorBox.textContent = "Choose a picture."; return; }
+    if(!pluginFileObj){ errorBox.textContent = "Choose the plugin file to upload."; return; }
+    if(pluginFileObj.size > 60*1024*1024){ errorBox.textContent = "That file is larger than 60MB — pick a smaller file."; return; }
+
+    submit.disabled = true; submit.textContent = "Publishing…";
+    var id = uuid();
+    var imageKey = "img_" + id, fileKey = "file_" + id;
+    Promise.all([
+      dbPut("blobs", {key: imageKey, blob: imgFileObj}),
+      dbPut("blobs", {key: fileKey, blob: pluginFileObj})
+    ]).then(function(){
+      var plugin = {
+        id: id, name: nameInput.value.trim(), description: descInput.value.trim(), tags: tags,
+        imageKey: imageKey, fileKey: fileKey, fileName: pluginFileObj.name, fileSize: pluginFileObj.size,
+        author: currentUser.username, favoriteCount: 0, createdAt: Date.now()
+      };
+      return dbPut("plugins", plugin).then(function(){
+        allPlugins.push(plugin);
+        imageUrlCache.set(imageKey, URL.createObjectURL(imgFileObj));
+        renderTagList(); renderGrid();
+        closeModal(overlay);
+        toast("Published " + plugin.name + "!");
+      });
+    }).catch(function(err){
+      errorBox.textContent = "Something went wrong: " + err.message;
+      submit.disabled = false; submit.textContent = "Publish plugin";
+    });
+  });
+  modal.appendChild(submit);
+
+  document.getElementById("modalRoot").appendChild(overlay);
+}
+
+/* ============================================================
+   CHAT / FRIENDS / BLOCKING
+============================================================ */
+var allUsersCache = null;      // usernameLower -> user
+var allFriendRequests = [];
+var allChats = [];
+var allMessages = [];
+var activeChatId = null;
+var activeChatNavTab = "chats";  // "chats" | "friends"
+var chatNavMode = "chats";       // "chats" | "friends" | "newdm" | "newgroup"
+var msgBlobUrlCache = new Map();
+var URL_RE = /((https?:\/\/|www\.)[^\s<]+[^\s<.,:;!?'")\]])/gi;
+
+function loadAllUsers(){
+  return dbGetAll("users").then(function(list){
+    allUsersCache = {};
+    list.forEach(function(u){ ensureUserShape(u); allUsersCache[u.usernameLower] = u; });
+    if(currentUser) allUsersCache[currentUser.usernameLower] = currentUser;
+    return allUsersCache;
+  });
+}
+function getUserByLower(lower){ return (allUsersCache && allUsersCache[lower]) || null; }
+function displayName(lower){ var u = getUserByLower(lower); return u ? u.username : lower; }
+
+function refreshChatData(){
+  return Promise.all([loadAllUsers(), dbGetAll("friendRequests"), dbGetAll("chats"), dbGetAll("messages")]).then(function(res){
+    allFriendRequests = res[1];
+    allChats = res[2];
+    allMessages = res[3];
+  });
+}
+
+function isBlockedEitherWay(aLower, bLower){
+  var a = getUserByLower(aLower), b = getUserByLower(bLower);
+  var aBlocked = a && a.blocked && a.blocked.indexOf(bLower) !== -1;
+  var bBlocked = b && b.blocked && b.blocked.indexOf(aLower) !== -1;
+  return !!(aBlocked || bBlocked);
+}
+
+/* ---- friend requests ---- */
+function incomingRequests(){
+  return allFriendRequests.filter(function(r){ return r.to === currentUser.usernameLower && r.status === "pending"; });
+}
+function outgoingRequests(){
+  return allFriendRequests.filter(function(r){ return r.from === currentUser.usernameLower && r.status === "pending"; });
+}
+function sendFriendRequest(targetUsername){
+  var targetLower = (targetUsername || "").trim().toLowerCase();
+  if(!targetLower) return Promise.reject(new Error("Enter a username."));
+  if(targetLower === currentUser.usernameLower) return Promise.reject(new Error("You can't friend yourself."));
+  return loadAllUsers().then(function(){
+    var target = getUserByLower(targetLower);
+    if(!target) throw new Error("No user with that username.");
+    if(currentUser.friends.indexOf(targetLower) !== -1) throw new Error("You're already friends.");
+    if(currentUser.blocked.indexOf(targetLower) !== -1) throw new Error("Unblock this user first.");
+    if((target.blocked || []).indexOf(currentUser.usernameLower) !== -1) throw new Error("You can't add this user.");
+    return dbGetAll("friendRequests");
+  }).then(function(reqs){
+    allFriendRequests = reqs;
+    var existing = reqs.filter(function(r){ return r.status === "pending"; }).find(function(r){
+      return (r.from === currentUser.usernameLower && r.to === targetLower) || (r.from === targetLower && r.to === currentUser.usernameLower);
+    });
+    if(existing){
+      if(existing.to === currentUser.usernameLower) throw new Error("They already sent you a request — check your requests.");
+      throw new Error("Request already sent.");
+    }
+    var reqObj = {id: uuid(), from: currentUser.usernameLower, to: targetLower, createdAt: Date.now(), status: "pending"};
+    return dbPut("friendRequests", reqObj).then(function(saved){ allFriendRequests.push(saved); return saved; });
+  });
+}
+function acceptFriendRequest(reqId){
+  var req = allFriendRequests.find(function(r){ return r.id === reqId; });
+  if(!req) return Promise.resolve();
+  return Promise.all([dbGet("users", req.from), dbGet("users", req.to)]).then(function(res){
+    var uFrom = ensureUserShape(res[0]), uTo = ensureUserShape(res[1]);
+    if(!uFrom || !uTo) return dbDelete("friendRequests", reqId);
+    if(uFrom.friends.indexOf(uTo.usernameLower) === -1) uFrom.friends.push(uTo.usernameLower);
+    if(uTo.friends.indexOf(uFrom.usernameLower) === -1) uTo.friends.push(uFrom.usernameLower);
+    return Promise.all([dbPut("users", uFrom), dbPut("users", uTo), dbDelete("friendRequests", reqId)]);
+  }).then(function(res){
+    if(res && res[0] && res[1]){
+      var savedFrom = res[0], savedTo = res[1];
+      if(allUsersCache){ allUsersCache[savedFrom.usernameLower] = savedFrom; allUsersCache[savedTo.usernameLower] = savedTo; }
+      if(currentUser.usernameLower === savedFrom.usernameLower) currentUser = savedFrom;
+      if(currentUser.usernameLower === savedTo.usernameLower) currentUser = savedTo;
+    }
+    allFriendRequests = allFriendRequests.filter(function(r){ return r.id !== reqId; });
+  });
+}
+function declineFriendRequest(reqId){
+  return dbDelete("friendRequests", reqId).then(function(){
+    allFriendRequests = allFriendRequests.filter(function(r){ return r.id !== reqId; });
+  });
+}
+function removeFriend(friendLower){
+  currentUser.friends = currentUser.friends.filter(function(f){ return f !== friendLower; });
+  var jobs = [dbPut("users", currentUser).then(function(saved){ currentUser = saved; })];
+  jobs.push(dbGet("users", friendLower).then(function(u){
+    if(!u) return;
+    ensureUserShape(u);
+    u.friends = u.friends.filter(function(f){ return f !== currentUser.usernameLower; });
+    return dbPut("users", u).then(function(saved){ if(allUsersCache) allUsersCache[saved.usernameLower] = saved; });
+  }));
+  return Promise.all(jobs);
+}
+
+/* ---- blocking ---- */
+function blockUser(targetLower){
+  if(currentUser.blocked.indexOf(targetLower) === -1) currentUser.blocked.push(targetLower);
+  currentUser.friends = currentUser.friends.filter(function(f){ return f !== targetLower; });
+  return dbPut("users", currentUser).then(function(saved){
+    currentUser = saved;
+    if(allUsersCache) allUsersCache[currentUser.usernameLower] = currentUser;
+    return dbGet("users", targetLower).then(function(u){
+      if(!u) return;
+      ensureUserShape(u);
+      if(u.friends.indexOf(currentUser.usernameLower) !== -1){
+        u.friends = u.friends.filter(function(f){ return f !== currentUser.usernameLower; });
+        return dbPut("users", u).then(function(saved2){ if(allUsersCache) allUsersCache[saved2.usernameLower] = saved2; });
+      }
+    });
+  });
+}
+function unblockUser(targetLower){
+  currentUser.blocked = currentUser.blocked.filter(function(b){ return b !== targetLower; });
+  return dbPut("users", currentUser).then(function(saved){
+    currentUser = saved;
+    if(allUsersCache) allUsersCache[currentUser.usernameLower] = currentUser;
+  });
+}
+
+/* ---- chats & messages ---- */
+function chatsForCurrentUser(){
+  return allChats.filter(function(c){
+    return c.members.indexOf(currentUser.usernameLower) !== -1;
+  }).filter(function(c){
+    if(c.type === "dm"){
+      var other = c.members.filter(function(m){ return m !== currentUser.usernameLower; })[0];
+      if(isBlockedEitherWay(currentUser.usernameLower, other)) return false;
+    }
+    return true;
+  }).sort(function(a, b){ return (b.lastMessageAt || b.createdAt) - (a.lastMessageAt || a.createdAt); });
+}
+function messagesForChat(chatId){
+  return allMessages.filter(function(m){ return m.chatId === chatId; }).sort(function(a, b){ return a.createdAt - b.createdAt; });
+}
+function findDM(otherLower){
+  return allChats.find(function(c){
+    return c.type === "dm" && c.members.length === 2 &&
+      c.members.indexOf(currentUser.usernameLower) !== -1 && c.members.indexOf(otherLower) !== -1;
+  });
+}
+function openOrCreateDM(otherLower){
+  if(otherLower === currentUser.usernameLower) return Promise.reject(new Error("You can't message yourself."));
+  if(isBlockedEitherWay(currentUser.usernameLower, otherLower)) return Promise.reject(new Error("You can't message this user."));
+  var existing = findDM(otherLower);
+  if(existing) return Promise.resolve(existing);
+  var chat = {id: uuid(), type: "dm", members: [currentUser.usernameLower, otherLower], createdBy: currentUser.usernameLower, createdAt: Date.now(), lastMessageAt: Date.now(), lastRead: {}};
+  return dbPut("chats", chat).then(function(saved){ allChats.push(saved); return saved; });
+}
+function createGroupChat(name, memberLowers){
+  var bad = memberLowers.filter(function(m){ return currentUser.friends.indexOf(m) === -1; });
+  if(bad.length) return Promise.reject(new Error("You can only add friends to a group."));
+  if(memberLowers.length < 2) return Promise.reject(new Error("Pick at least 2 friends for a group."));
+  var members = [currentUser.usernameLower].concat(memberLowers);
+  var chat = {id: uuid(), type: "group", name: (name || "").trim() || null, members: members, createdBy: currentUser.usernameLower, createdAt: Date.now(), lastMessageAt: Date.now(), lastRead: {}};
+  return dbPut("chats", chat).then(function(saved){ allChats.push(saved); return saved; });
+}
+function chatTitle(chat){
+  if(chat.type === "group"){
+    if(chat.name) return chat.name;
+    return chat.members.filter(function(m){ return m !== currentUser.usernameLower; }).map(displayName).join(", ");
+  }
+  var other = chat.members.filter(function(m){ return m !== currentUser.usernameLower; })[0];
+  return displayName(other);
+}
+function sendMessage(chatId, text, pendingFiles){
+  var chat = allChats.find(function(c){ return c.id === chatId; });
+  if(!chat) return Promise.reject(new Error("Chat not found."));
+  if(chat.type === "dm"){
+    var other = chat.members.filter(function(m){ return m !== currentUser.usernameLower; })[0];
+    if(isBlockedEitherWay(currentUser.usernameLower, other)) return Promise.reject(new Error("You can't message this user."));
+  }
+  text = (text || "").trim();
+  var files = pendingFiles || [];
+  if(!text && files.length === 0) return Promise.reject(new Error("Write a message or attach a file."));
+  var attJobs = files.map(function(p){
+    var key = "msgatt_" + uuid();
+    return dbPut("blobs", {key: key, blob: p.file}).then(function(){
+      return {type: p.file.type && p.file.type.indexOf("image/") === 0 ? "image" : "file", blobKey: key, name: p.file.name, size: p.file.size};
+    });
+  });
+  return Promise.all(attJobs).then(function(attachments){
+    var msg = {id: uuid(), chatId: chatId, from: currentUser.usernameLower, text: text, attachments: attachments, createdAt: Date.now()};
+    chat.lastMessageAt = msg.createdAt;
+    if(!chat.lastRead) chat.lastRead = {};
+    chat.lastRead[currentUser.usernameLower] = msg.createdAt;
+    return Promise.all([dbPut("messages", msg), dbPut("chats", chat)]).then(function(){
+      allMessages.push(msg);
+      return msg;
+    });
+  });
+}
+function markChatRead(chatId){
+  var chat = allChats.find(function(c){ return c.id === chatId; });
+  if(!chat) return Promise.resolve();
+  if(!chat.lastRead) chat.lastRead = {};
+  chat.lastRead[currentUser.usernameLower] = Date.now();
+  return dbPut("chats", chat);
+}
+function unreadCountFor(chat){
+  var lastRead = (chat.lastRead && chat.lastRead[currentUser.usernameLower]) || 0;
+  return messagesForChat(chat.id).filter(function(m){ return m.createdAt > lastRead && m.from !== currentUser.usernameLower; }).length;
+}
+function linkify(text){
+  var frag = document.createDocumentFragment();
+  var lastIndex = 0;
+  URL_RE.lastIndex = 0;
+  var m;
+  while((m = URL_RE.exec(text))){
+    if(m.index > lastIndex) frag.appendChild(document.createTextNode(text.slice(lastIndex, m.index)));
+    var a = document.createElement("a");
+    a.href = m[0].indexOf("http") === 0 ? m[0] : "https://" + m[0];
+    a.target = "_blank"; a.rel = "noopener noreferrer"; a.className = "link-inline"; a.textContent = m[0];
+    frag.appendChild(a);
+    lastIndex = m.index + m[0].length;
+  }
+  if(lastIndex < text.length) frag.appendChild(document.createTextNode(text.slice(lastIndex)));
+  return frag;
+}
+
+/* ---- badge ---- */
+function updateBadgeDisplay(){
+  var badge = document.getElementById("chatBadge");
+  if(!badge) return;
+  if(!currentUser){ badge.classList.add("hidden"); return; }
+  var n = chatsForCurrentUser().reduce(function(sum, c){ return sum + (unreadCountFor(c) > 0 ? 1 : 0); }, 0);
+  if(n > 0){ badge.textContent = n > 9 ? "9+" : String(n); badge.classList.remove("hidden"); }
+  else { badge.classList.add("hidden"); }
+}
+
+/* ---- chat modal shell ---- */
+function openChatModal(focusChatId){
+  if(!currentUser){ openAuthModal("signin"); toast("Sign in to use chat."); return; }
+  refreshChatData().then(function(){
+    buildChatModal(focusChatId);
+  });
+}
+function buildChatModal(focusChatId){
+  var overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.addEventListener("click", function(e){ if(e.target === overlay) closeModal(overlay); });
+  var modal = document.createElement("div");
+  modal.className = "modal chat-modal";
+  overlay.appendChild(modal);
+
+  var head = document.createElement("div"); head.className = "modal-head";
+  var h2 = document.createElement("h2"); h2.textContent = "Messages";
+  var closeBtn = document.createElement("button");
+  closeBtn.className = "modal-close"; closeBtn.type = "button"; closeBtn.setAttribute("aria-label", "Close");
+  closeBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  closeBtn.addEventListener("click", function(){ closeModal(overlay); });
+  head.appendChild(h2); head.appendChild(closeBtn);
+  modal.appendChild(head);
+
+  var body = document.createElement("div"); body.className = "chat-body";
+  var nav = document.createElement("div"); nav.className = "chat-nav"; nav.id = "chatNav";
+  var main = document.createElement("div"); main.className = "chat-main"; main.id = "chatMain";
+  body.appendChild(nav); body.appendChild(main);
+  modal.appendChild(body);
+
+  document.getElementById("modalRoot").appendChild(overlay);
+
+  activeChatNavTab = "chats";
+  var visible = chatsForCurrentUser();
+  activeChatId = focusChatId && visible.find(function(c){ return c.id === focusChatId; }) ? focusChatId : null;
+
+  renderChatNav();
+  renderChatMain();
+  if(activeChatId) markChatRead(activeChatId).then(updateBadgeDisplay);
+  updateBadgeDisplay();
+}
+
+/* ---- nav (chats list / friends panel) ---- */
+function renderChatNav(){
+  var nav = document.getElementById("chatNav");
+  if(!nav) return;
+  chatNavMode = activeChatNavTab;
+  nav.innerHTML = "";
+
+  var tabs = document.createElement("div"); tabs.className = "chat-tabs";
+  var tabChats = document.createElement("button"); tabChats.type = "button";
+  tabChats.className = "chat-tab" + (activeChatNavTab === "chats" ? " active" : "");
+  tabChats.textContent = "Chats";
+  var tabFriends = document.createElement("button"); tabFriends.type = "button";
+  tabFriends.className = "chat-tab" + (activeChatNavTab === "friends" ? " active" : "");
+  tabFriends.appendChild(document.createTextNode("Friends"));
+  var reqCount = incomingRequests().length;
+  if(reqCount > 0){
+    var badge = document.createElement("span"); badge.className = "tab-badge"; badge.textContent = String(reqCount);
+    tabFriends.appendChild(badge);
+  }
+  tabChats.addEventListener("click", function(){ activeChatNavTab = "chats"; renderChatNav(); });
+  tabFriends.addEventListener("click", function(){ activeChatNavTab = "friends"; renderChatNav(); });
+  tabs.appendChild(tabChats); tabs.appendChild(tabFriends);
+  nav.appendChild(tabs);
+
+  var list = document.createElement("div"); list.className = "chat-nav-list"; list.id = "chatNavList";
+  nav.appendChild(list);
+
+  if(activeChatNavTab === "chats"){
+    renderChatsList(list);
+    var actions = document.createElement("div"); actions.className = "chat-nav-actions";
+    var newDmBtn = document.createElement("button"); newDmBtn.className = "btn btn-sm"; newDmBtn.type = "button"; newDmBtn.textContent = "New DM";
+    newDmBtn.addEventListener("click", openNewDmPanel);
+    var newGroupBtn = document.createElement("button"); newGroupBtn.className = "btn btn-sm"; newGroupBtn.type = "button"; newGroupBtn.textContent = "New group";
+    newGroupBtn.addEventListener("click", openNewGroupPanel);
+    actions.appendChild(newDmBtn); actions.appendChild(newGroupBtn);
+    nav.appendChild(actions);
+  } else {
+    renderFriendsPanel(list);
+  }
+}
+function renderChatsList(container){
+  container.innerHTML = "";
+  var chats = chatsForCurrentUser();
+  if(!chats.length){
+    var empty = document.createElement("div"); empty.className = "chat-nav-empty"; empty.textContent = "No chats yet. Start a DM or group.";
+    container.appendChild(empty);
+    return;
+  }
+  chats.forEach(function(c){
+    var row = document.createElement("button"); row.type = "button"; row.className = "chat-row" + (c.id === activeChatId ? " active" : "");
+    if(c.type === "group"){
+      var ga = document.createElement("span"); ga.className = "group-avatar";
+      ga.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+      row.appendChild(ga);
+    } else {
+      var other = c.members.filter(function(m){ return m !== currentUser.usernameLower; })[0];
+      var av = document.createElement("span"); av.className = "avatar"; av.style.background = avatarColor(displayName(other));
+      av.textContent = displayName(other).charAt(0).toUpperCase();
+      row.appendChild(av);
+    }
+    var textWrap = document.createElement("span"); textWrap.className = "chat-row-text";
+    var nameEl = document.createElement("span"); nameEl.className = "chat-row-name"; nameEl.textContent = chatTitle(c);
+    var msgs = messagesForChat(c.id);
+    var last = msgs[msgs.length - 1];
+    var prevEl = document.createElement("span"); prevEl.className = "chat-row-preview";
+    prevEl.textContent = last ? ((last.from === currentUser.usernameLower ? "You: " : "") + (last.text || (last.attachments && last.attachments.length ? "Sent an attachment" : ""))) : "No messages yet";
+    textWrap.appendChild(nameEl); textWrap.appendChild(prevEl);
+    row.appendChild(textWrap);
+    if(unreadCountFor(c) > 0){ var dot = document.createElement("span"); dot.className = "chat-row-unread"; row.appendChild(dot); }
+    row.addEventListener("click", function(){
+      activeChatId = c.id;
+      markChatRead(c.id).then(function(){ renderChatNav(); renderChatMain(); updateBadgeDisplay(); });
+    });
+    container.appendChild(row);
+  });
+}
+function friendActionRow(labelName, avLower, actionsEls){
+  var row = document.createElement("div"); row.className = "friend-row";
+  var av = document.createElement("span"); av.className = "avatar"; av.style.background = avatarColor(displayName(avLower));
+  av.textContent = displayName(avLower).charAt(0).toUpperCase();
+  var name = document.createElement("span"); name.className = "friend-row-text"; name.textContent = labelName;
+  var actions = document.createElement("span"); actions.style.display = "flex"; actions.style.gap = "6px"; actions.style.flex = "none";
+  actionsEls.forEach(function(el){ actions.appendChild(el); });
+  row.appendChild(av); row.appendChild(name); row.appendChild(actions);
+  return row;
+}
+function renderFriendsPanel(container){
+  container.innerHTML = "";
+  var searchWrap = document.createElement("div"); searchWrap.className = "friend-search";
+  var input = document.createElement("input"); input.type = "text"; input.placeholder = "Add friend by username…";
+  var addBtn = document.createElement("button"); addBtn.className = "btn btn-sm btn-primary"; addBtn.type = "button"; addBtn.textContent = "Add";
+  function doAdd(){
+    var val = input.value.trim();
+    if(!val) return;
+    sendFriendRequest(val).then(function(){ toast("Friend request sent."); renderChatNav(); }).catch(function(err){ toast(err.message); });
+  }
+  addBtn.addEventListener("click", doAdd);
+  input.addEventListener("keydown", function(e){ if(e.key === "Enter") doAdd(); });
+  searchWrap.appendChild(input); searchWrap.appendChild(addBtn);
+  container.appendChild(searchWrap);
+
+  var incoming = incomingRequests();
+  if(incoming.length){
+    var t1 = document.createElement("div"); t1.className = "request-section-title"; t1.textContent = "Requests";
+    container.appendChild(t1);
+    incoming.forEach(function(r){
+      var accept = document.createElement("button"); accept.className = "btn btn-sm"; accept.type = "button"; accept.textContent = "Accept";
+      accept.addEventListener("click", function(){
+        acceptFriendRequest(r.id).then(function(){ toast("You're now friends with " + displayName(r.from) + "."); renderChatNav(); });
+      });
+      var decline = document.createElement("button"); decline.className = "btn btn-sm btn-ghost"; decline.type = "button"; decline.textContent = "Decline";
+      decline.addEventListener("click", function(){ declineFriendRequest(r.id).then(renderChatNav); });
+      container.appendChild(friendActionRow(displayName(r.from), r.from, [accept, decline]));
+    });
+  }
+
+  var outgoing = outgoingRequests();
+  if(outgoing.length){
+    var t2 = document.createElement("div"); t2.className = "request-section-title"; t2.textContent = "Sent";
+    container.appendChild(t2);
+    outgoing.forEach(function(r){
+      var cancel = document.createElement("button"); cancel.className = "btn btn-sm btn-ghost"; cancel.type = "button"; cancel.textContent = "Cancel";
+      cancel.addEventListener("click", function(){ declineFriendRequest(r.id).then(renderChatNav); });
+      container.appendChild(friendActionRow(displayName(r.to), r.to, [cancel]));
+    });
+  }
+
+  var t3 = document.createElement("div"); t3.className = "request-section-title"; t3.textContent = "Friends (" + currentUser.friends.length + ")";
+  container.appendChild(t3);
+  if(!currentUser.friends.length){
+    var e = document.createElement("div"); e.className = "chat-nav-empty"; e.textContent = "No friends yet — add one above.";
+    container.appendChild(e);
+  }
+  currentUser.friends.forEach(function(fLower){
+    var msgBtn = document.createElement("button"); msgBtn.className = "btn btn-sm"; msgBtn.type = "button"; msgBtn.title = "Message"; msgBtn.textContent = "Msg";
+    msgBtn.addEventListener("click", function(){
+      openOrCreateDM(fLower).then(function(chat){
+        activeChatId = chat.id; activeChatNavTab = "chats";
+        markChatRead(chat.id).then(function(){ renderChatNav(); renderChatMain(); updateBadgeDisplay(); });
+      }).catch(function(err){ toast(err.message); });
+    });
+    var blockBtn = document.createElement("button"); blockBtn.className = "btn btn-sm btn-danger"; blockBtn.type = "button"; blockBtn.textContent = "Block";
+    blockBtn.addEventListener("click", function(){
+      blockUser(fLower).then(function(){ toast("Blocked " + displayName(fLower) + "."); renderChatNav(); renderChatMain(); });
+    });
+    container.appendChild(friendActionRow(displayName(fLower), fLower, [msgBtn, blockBtn]));
+  });
+
+  if(currentUser.blocked.length){
+    var t4 = document.createElement("div"); t4.className = "request-section-title"; t4.textContent = "Blocked";
+    container.appendChild(t4);
+    currentUser.blocked.forEach(function(bLower){
+      var unblockBtn = document.createElement("button"); unblockBtn.className = "btn btn-sm"; unblockBtn.type = "button"; unblockBtn.textContent = "Unblock";
+      unblockBtn.addEventListener("click", function(){
+        unblockUser(bLower).then(function(){ toast("Unblocked " + displayName(bLower) + "."); renderChatNav(); renderChatMain(); });
+      });
+      container.appendChild(friendActionRow(displayName(bLower), bLower, [unblockBtn]));
+    });
+  }
+}
+
+/* ---- new DM / new group pickers ---- */
+function openNewDmPanel(){
+  chatNavMode = "newdm";
+  var nav = document.getElementById("chatNav");
+  nav.innerHTML = "";
+  var head = document.createElement("div"); head.className = "chat-tabs";
+  var back = document.createElement("button"); back.type = "button"; back.className = "chat-tab active"; back.textContent = "← New direct message";
+  back.addEventListener("click", renderChatNav);
+  head.appendChild(back);
+  nav.appendChild(head);
+
+  var panel = document.createElement("div"); panel.className = "new-chat-panel";
+  var input = document.createElement("input"); input.type = "text"; input.placeholder = "Search username…";
+  panel.appendChild(input);
+  var results = document.createElement("div");
+  panel.appendChild(results);
+  nav.appendChild(panel);
+
+  function renderResults(){
+    results.innerHTML = "";
+    var q = input.value.trim().toLowerCase();
+    var list = Object.keys(allUsersCache || {}).map(function(k){ return allUsersCache[k]; })
+      .filter(function(u){ return u.usernameLower !== currentUser.usernameLower; })
+      .filter(function(u){ return !isBlockedEitherWay(currentUser.usernameLower, u.usernameLower); })
+      .filter(function(u){ return !q || u.usernameLower.indexOf(q) !== -1; })
+      .sort(function(a, b){ return a.username.localeCompare(b.username); });
+    if(!list.length){
+      var e = document.createElement("div"); e.className = "chat-nav-empty"; e.textContent = "No users found.";
+      results.appendChild(e);
+      return;
+    }
+    list.forEach(function(u){
+      var row = document.createElement("div"); row.className = "friend-row"; row.style.cursor = "pointer";
+      var av = document.createElement("span"); av.className = "avatar"; av.style.background = avatarColor(u.username);
+      av.textContent = u.username.charAt(0).toUpperCase();
+      var name = document.createElement("span"); name.className = "friend-row-text"; name.textContent = u.username;
+      row.appendChild(av); row.appendChild(name);
+      row.addEventListener("click", function(){
+        openOrCreateDM(u.usernameLower).then(function(chat){
+          activeChatId = chat.id; activeChatNavTab = "chats";
+          markChatRead(chat.id).then(function(){ renderChatNav(); renderChatMain(); updateBadgeDisplay(); });
+        }).catch(function(err){ toast(err.message); });
+      });
+      results.appendChild(row);
+    });
+  }
+  input.addEventListener("input", renderResults);
+  renderResults();
+  input.focus();
+}
+function openNewGroupPanel(){
+  chatNavMode = "newgroup";
+  var nav = document.getElementById("chatNav");
+  nav.innerHTML = "";
+  var head = document.createElement("div"); head.className = "chat-tabs";
+  var back = document.createElement("button"); back.type = "button"; back.className = "chat-tab active"; back.textContent = "← New group (friends only)";
+  back.addEventListener("click", renderChatNav);
+  head.appendChild(back);
+  nav.appendChild(head);
+
+  var panel = document.createElement("div"); panel.className = "new-chat-panel";
+  var nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.placeholder = "Group name (optional)";
+  panel.appendChild(nameInput);
+
+  var selected = new Set();
+  if(!currentUser.friends.length){
+    var e = document.createElement("div"); e.className = "chat-nav-empty"; e.textContent = "Add some friends first — groups can only include friends.";
+    panel.appendChild(e);
+  } else {
+    currentUser.friends.forEach(function(fLower){
+      var row = document.createElement("label"); row.className = "friend-pick";
+      var cb = document.createElement("input"); cb.type = "checkbox";
+      cb.addEventListener("change", function(){ if(cb.checked) selected.add(fLower); else selected.delete(fLower); });
+      var av = document.createElement("span"); av.className = "avatar";
+      av.style.width = "26px"; av.style.height = "26px"; av.style.fontSize = "11px";
+      av.style.background = avatarColor(displayName(fLower)); av.textContent = displayName(fLower).charAt(0).toUpperCase();
+      var name = document.createElement("span"); name.textContent = displayName(fLower);
+      row.appendChild(cb); row.appendChild(av); row.appendChild(name);
+      panel.appendChild(row);
+    });
+  }
+  nav.appendChild(panel);
+
+  var actions = document.createElement("div"); actions.className = "chat-nav-actions";
+  var createBtn = document.createElement("button"); createBtn.className = "btn btn-primary btn-sm"; createBtn.type = "button"; createBtn.textContent = "Create group";
+  createBtn.addEventListener("click", function(){
+    var members = Array.from(selected);
+    createGroupChat(nameInput.value, members).then(function(chat){
+      toast("Group created.");
+      activeChatId = chat.id; activeChatNavTab = "chats";
+      renderChatNav(); renderChatMain();
+    }).catch(function(err){ toast(err.message); });
+  });
+  actions.appendChild(createBtn);
+  nav.appendChild(actions);
+}
+
+/* ---- main thread + compose ---- */
+function renderChatMain(){
+  var main = document.getElementById("chatMain");
+  if(!main) return;
+  main.innerHTML = "";
+  var chat = allChats.find(function(c){ return c.id === activeChatId; });
+  if(!chat){
+    var ph = document.createElement("div"); ph.className = "chat-placeholder";
+    ph.textContent = "Select a chat, or start a new direct message or group.";
+    main.appendChild(ph);
+    return;
+  }
+  var mHead = document.createElement("div"); mHead.className = "chat-main-head";
+  if(chat.type === "group"){
+    var ga = document.createElement("span"); ga.className = "group-avatar";
+    ga.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+    mHead.appendChild(ga);
+  } else {
+    var other = chat.members.filter(function(m){ return m !== currentUser.usernameLower; })[0];
+    var av = document.createElement("span"); av.className = "avatar"; av.style.background = avatarColor(displayName(other));
+    av.textContent = displayName(other).charAt(0).toUpperCase();
+    mHead.appendChild(av);
+  }
+  var titleWrap = document.createElement("div");
+  var title = document.createElement("div"); title.className = "title"; title.textContent = chatTitle(chat);
+  var sub = document.createElement("div"); sub.className = "sub";
+  sub.textContent = chat.type === "group" ? (chat.members.length + " members") : "Direct message";
+  titleWrap.appendChild(title); titleWrap.appendChild(sub);
+  mHead.appendChild(titleWrap);
+
+  var spacer = document.createElement("div"); spacer.style.marginLeft = "auto"; mHead.appendChild(spacer);
+  if(chat.type === "dm"){
+    var otherLower = chat.members.filter(function(m){ return m !== currentUser.usernameLower; })[0];
+    var isBlockedByMe = currentUser.blocked.indexOf(otherLower) !== -1;
+    var blockBtn = document.createElement("button");
+    blockBtn.className = "btn btn-sm" + (isBlockedByMe ? "" : " btn-danger"); blockBtn.type = "button";
+    blockBtn.textContent = isBlockedByMe ? "Unblock" : "Block";
+    blockBtn.addEventListener("click", function(){
+      (isBlockedByMe ? unblockUser(otherLower) : blockUser(otherLower)).then(function(){
+        toast((isBlockedByMe ? "Unblocked " : "Blocked ") + displayName(otherLower) + ".");
+        renderChatNav(); renderChatMain();
+      });
+    });
+    mHead.appendChild(blockBtn);
+  }
+  main.appendChild(mHead);
+
+  var thread = document.createElement("div"); thread.className = "chat-thread"; thread.id = "chatThread";
+  main.appendChild(thread);
+  renderThreadMessages(chat, thread);
+
+  main.appendChild(buildComposeBar(chat));
+}
+function renderThreadMessages(chat, thread){
+  thread.innerHTML = "";
+  var msgs = messagesForChat(chat.id);
+  if(!msgs.length){
+    var ph = document.createElement("div"); ph.className = "chat-placeholder"; ph.textContent = "No messages yet. Say hi!";
+    thread.appendChild(ph);
+    return;
+  }
+  msgs.forEach(function(m){
+    var row = document.createElement("div"); row.className = "msg-row" + (m.from === currentUser.usernameLower ? " mine" : "");
+    var av = document.createElement("span"); av.className = "avatar"; av.style.background = avatarColor(displayName(m.from));
+    av.textContent = displayName(m.from).charAt(0).toUpperCase();
+    row.appendChild(av);
+
+    var col = document.createElement("div"); col.className = "msg-col";
+    var meta = document.createElement("div"); meta.className = "msg-meta";
+    meta.textContent = (chat.type === "group" ? displayName(m.from) + " · " : "") + fmtDate(m.createdAt) + " " +
+      new Date(m.createdAt).toLocaleTimeString(undefined, {hour: "numeric", minute: "2-digit"});
+    col.appendChild(meta);
+
+    if(m.text){
+      var bubble = document.createElement("div"); bubble.className = "msg-bubble";
+      bubble.appendChild(linkify(m.text));
+      col.appendChild(bubble);
+    }
+    if(m.attachments && m.attachments.length){
+      var attWrap = document.createElement("div"); attWrap.className = "msg-attachments";
+      m.attachments.forEach(function(a){
+        if(a.type === "image"){
+          var img = document.createElement("img"); img.className = "msg-img"; img.alt = a.name || "image";
+          if(msgBlobUrlCache.has(a.blobKey)){
+            img.src = msgBlobUrlCache.get(a.blobKey);
+          } else {
+            dbGet("blobs", a.blobKey).then(function(rec){
+              if(rec && rec.blob){ var url = URL.createObjectURL(rec.blob); msgBlobUrlCache.set(a.blobKey, url); img.src = url; }
+            });
+          }
+          img.addEventListener("click", function(){ if(img.src) window.open(img.src, "_blank"); });
+          attWrap.appendChild(img);
+        } else {
+          var chip = document.createElement("div"); chip.className = "msg-file-chip";
+          chip.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+          var fname = document.createElement("span"); fname.className = "fname"; fname.textContent = a.name;
+          var size = document.createElement("span"); size.textContent = fmtSize(a.size);
+          size.style.color = "var(--faint)"; size.style.fontSize = "10.5px"; size.style.flex = "none";
+          var dl = document.createElement("button"); dl.type = "button"; dl.title = "Download";
+          dl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+          dl.addEventListener("click", function(){
+            dbGet("blobs", a.blobKey).then(function(rec){
+              if(!rec){ toast("File not found."); return; }
+              var url = URL.createObjectURL(rec.blob);
+              var link = document.createElement("a"); link.href = url; link.download = a.name || "file";
+              document.body.appendChild(link); link.click(); link.remove();
+              setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+            });
+          });
+          chip.appendChild(fname); chip.appendChild(size); chip.appendChild(dl);
+          attWrap.appendChild(chip);
+        }
+      });
+      col.appendChild(attWrap);
+    }
+    row.appendChild(col);
+    thread.appendChild(row);
+  });
+  thread.scrollTop = thread.scrollHeight;
+}
+function buildComposeBar(chat){
+  var wrap = document.createElement("div"); wrap.className = "chat-compose";
+  var blockedPair = chat.type === "dm" && isBlockedEitherWay(currentUser.usernameLower, chat.members.filter(function(m){ return m !== currentUser.usernameLower; })[0]);
+  if(blockedPair){
+    var note = document.createElement("div"); note.className = "chat-placeholder";
+    note.style.margin = "0"; note.style.padding = "4px 0"; note.textContent = "You can't message this user.";
+    wrap.appendChild(note);
+    return wrap;
+  }
+
+  var pending = [];
+  var attStrip = document.createElement("div"); attStrip.className = "compose-attachments";
+  wrap.appendChild(attStrip);
+  function renderAttStrip(){
+    attStrip.innerHTML = "";
+    pending.forEach(function(p, i){
+      var chip = document.createElement("div"); chip.className = "msg-file-chip";
+      var fname = document.createElement("span"); fname.className = "fname"; fname.textContent = p.file.name;
+      var rm = document.createElement("button"); rm.type = "button";
+      rm.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+      rm.addEventListener("click", function(){ pending.splice(i, 1); renderAttStrip(); });
+      chip.appendChild(fname); chip.appendChild(rm);
+      attStrip.appendChild(chip);
+    });
+  }
+
+  var row = document.createElement("div"); row.className = "compose-row";
+
+  var imgInput = document.createElement("input"); imgInput.type = "file"; imgInput.accept = "image/*"; imgInput.className = "hidden";
+  imgInput.addEventListener("change", function(){ if(imgInput.files[0]){ pending.push({file: imgInput.files[0]}); renderAttStrip(); } imgInput.value = ""; });
+  var imgBtn = document.createElement("button"); imgBtn.type = "button"; imgBtn.className = "compose-icon-btn"; imgBtn.title = "Attach image";
+  imgBtn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+  imgBtn.addEventListener("click", function(){ imgInput.click(); });
+
+  var fileInput = document.createElement("input"); fileInput.type = "file"; fileInput.className = "hidden";
+  fileInput.addEventListener("change", function(){ if(fileInput.files[0]){ pending.push({file: fileInput.files[0]}); renderAttStrip(); } fileInput.value = ""; });
+  var fileBtn = document.createElement("button"); fileBtn.type = "button"; fileBtn.className = "compose-icon-btn"; fileBtn.title = "Attach file";
+  fileBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>';
+  fileBtn.addEventListener("click", function(){ fileInput.click(); });
+
+  var textInput = document.createElement("input"); textInput.type = "text";
+  textInput.placeholder = "Message " + chatTitle(chat) + "…"; textInput.autocomplete = "off";
+
+  var sendBtn = document.createElement("button"); sendBtn.type = "button"; sendBtn.className = "compose-icon-btn compose-send"; sendBtn.title = "Send";
+  sendBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+
+  function doSend(){
+    var text = textInput.value;
+    var files = pending.slice();
+    sendMessage(chat.id, text, files).then(function(){
+      textInput.value = ""; pending = []; renderAttStrip();
+      renderChatNav();
+      var thread = document.getElementById("chatThread");
+      if(thread) renderThreadMessages(chat, thread);
+      markChatRead(chat.id).then(updateBadgeDisplay);
+    }).catch(function(err){ toast(err.message); });
+  }
+  sendBtn.addEventListener("click", doSend);
+  textInput.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); doSend(); } });
+
+  row.appendChild(imgBtn); row.appendChild(fileBtn); row.appendChild(textInput); row.appendChild(sendBtn);
+  wrap.appendChild(row);
+  wrap.appendChild(imgInput); wrap.appendChild(fileInput);
+  return wrap;
+}
+
+/* ---- background refresh (picks up messages from other signed-in tabs) ---- */
+setInterval(function(){
+  if(!currentUser) return;
+  refreshChatData().then(function(){
+    updateBadgeDisplay();
+    if(!document.getElementById("chatNav")) return;
+    var navFocused = document.activeElement && document.getElementById("chatNav").contains(document.activeElement);
+    if(chatNavMode === "chats" && !navFocused) renderChatNav();
+    if(activeChatId){
+      var chat = allChats.find(function(c){ return c.id === activeChatId; });
+      var thread = document.getElementById("chatThread");
+      if(chat && thread) renderThreadMessages(chat, thread);
+    }
+  });
+}, 5000);
+
+/* ============================================================
+   GLOBAL EVENT WIRING
+============================================================ */
+var searchTimer;
+document.getElementById("searchInput").addEventListener("input", function(e){
+  clearTimeout(searchTimer);
+  var val = e.target.value;
+  searchTimer = setTimeout(function(){ searchQuery = val; renderGrid(); }, 150);
+});
+document.getElementById("sortSelect").addEventListener("change", function(e){
+  sortBy = e.target.value; renderGrid();
+});
+document.getElementById("favToggle").addEventListener("click", function(){
+  if(!currentUser){ openAuthModal("signin"); toast("Sign in to view favorites."); return; }
+  favoritesOnly = !favoritesOnly;
+  this.classList.toggle("active", favoritesOnly);
+  renderGrid();
+});
+document.getElementById("fabAdd").addEventListener("click", openAddPluginModal);
+document.getElementById("chatBtn").addEventListener("click", function(){ openChatModal(); });
+
+/* ============================================================
+   INIT
+============================================================ */
+function renderAll(){
+  renderAuthArea();
+  renderTagList();
+  renderGrid();
+  var fab = document.getElementById("fabAdd");
+  if(currentUser && currentUser.isAdmin){
+    fab.classList.remove("hidden");
+    if(allPlugins.length === 0) fab.classList.add("pulse"); else fab.classList.remove("pulse");
+  } else {
+    fab.classList.add("hidden");
+  }
+  if(currentUser){ refreshChatData().then(updateBadgeDisplay); }
+  else { var badge = document.getElementById("chatBadge"); if(badge) badge.classList.add("hidden"); }
+}
+
+restoreSession().then(loadAll).then(function(){
+  renderAll();
+}).catch(function(err){
+  document.getElementById("grid").innerHTML = "";
+  var msg = document.createElement("div");
+  msg.className = "empty-state";
+  msg.innerHTML = "<h3>Couldn't load FlexPlugs</h3><p>" + err.message + "</p>";
+  document.getElementById("grid").appendChild(msg);
+});
+
+})();
+</script>
+</body>
+</html>
